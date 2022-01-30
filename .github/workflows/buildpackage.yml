@@ -1,0 +1,80 @@
+name: BuildPackage for Release
+
+on:
+
+  push:
+    tags:
+      - AO-**
+
+jobs:
+
+  arm64_job:
+
+    name: Debian Bullseye (arm64)
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2.1.0
+        with:
+          submodules: true
+
+      - name: COMPILE
+        uses: uraimo/run-on-arch-action@v2.1.1
+        with:
+          arch: aarch64
+          distro: bullseye
+
+          githubToken: ${{ github.token }}
+
+          dockerRunArgs: --volume "${{ github.workspace }}:/root"
+
+          install: |
+            apt-get update -q --yes
+            PKGS="build-essential git-buildpackage equivs"
+            apt-get install --no-install-recommends --yes $PKGS
+
+          run: |
+            mk-build-deps -i -t 'apt-get --no-install-recommends --yes'
+            rm -f superslicer-build-deps_*
+            GBPOPTS="--git-export-dir=artifacts --git-upstream-tree=SLOPPY"
+            gbp buildpackage -uc -us -J2 -j2 --git-submodules $GBPOPTS
+    
+      - name: DEPLOY
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/*.deb
+            artifacts/*.xz
+            artifacts/*.gz
+            artifacts/*.dsc
+            artifacts/*.build*
+            artifacts/*.changes
+
+  amd64_job:
+
+    name: Debian Bullseye (amd64)
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2.1.0
+        with:
+          submodules: true
+
+      - name: COMPILE
+        uses: ./.github/debian_bullseye/
+        with:
+          args: >
+            /bin/sh -c "
+            mk-build-deps -i -t 'apt-get --no-install-recommends --yes' ;
+            rm -f superslicer-build-deps_* ;
+            GBPOPTS='--git-export-dir=artifacts --git-upstream-tree=SLOPPY' ;
+            gbp buildpackage -uc -us -J2 -j2 --git-submodules $GBPOPTS
+            "
+      - name: DEPLOY
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/*.deb
+            artifacts/*.xz
+            artifacts/*.gz
+            artifacts/*.dsc
+            artifacts/*.build*
+            artifacts/*.changes
