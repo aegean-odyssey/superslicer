@@ -1,0 +1,42 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/default.mk
+
+# less debug info to avoid running out of address space
+ifneq (,$(filter $(DEB_HOST_ARCH), mips mipsel))
+	export DEB_CXXFLAGS_MAINT_APPEND += --param ggc-min-expand=5 -g0
+else ifneq (,$(filter $(DEB_HOST_ARCH), armhf))
+	export DEB_CXXFLAGS_MAINT_APPEND += -g1
+endif
+
+ifneq (,$(filter $(DEB_HOST_ARCH), i386))
+        export DEB_CXXFLAGS_MAINT_APPEND += -ffloat-store
+endif
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	dh_auto_configure --buildsystem=cmake -- \
+		-DBUILD_TESTING=0 \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DSLIC3R_FHS=1 \
+		-DSLIC3R_WX_STABLE=1 \
+		-DSLIC3R_GTK=3
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -f cmake/CPackConfig.cmake
+
+override_dh_auto_install:
+	dh_auto_install --destdir=debian/superslicer
+	# hack, remove some things that we don't need or use
+	rm -f debian/superslicer/usr/share/applications/SuperSlicer*
+	rm -f debian/superslicer/usr/share/SuperSlicer/fonts/*
+	rm -fR debian/superslicer/usr/share/SuperSlicer/data
+
+override_dh_auto_test:
+	dh_auto_test -- ARGS=-V
+
+override_dh_dwz:
+

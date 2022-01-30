@@ -1,0 +1,12 @@
+--- a/src/slic3r/GUI/GUI_App.cpp
++++ b/src/slic3r/GUI/GUI_App.cpp
+@@ -896,9 +896,7 @@
+         // create splash screen with updated bmp
+         scrn = new SplashScreen(bmp.IsOk() ? bmp : create_scaled_bitmap( SLIC3R_APP_KEY "_logo", nullptr, 400), 
+                                 wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 4000, splashscreen_pos, artist);
+-#ifndef __linux__
+         wxYield();
+-#endif
+         scrn->SetText(_L("Loading configuration")+ dots);
+     }
+ 

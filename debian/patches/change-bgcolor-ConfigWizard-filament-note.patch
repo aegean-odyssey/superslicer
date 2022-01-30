@@ -1,0 +1,11 @@
+--- a/src/slic3r/GUI/ConfigWizard.cpp
++++ b/src/slic3r/GUI/ConfigWizard.cpp
+@@ -702,7 +702,7 @@
+ void PageMaterials::set_compatible_printers_html_window(const std::vector<std::string>& printer_names, bool all_printers)
+ {
+     const auto bgr_clr = 
+-#if defined(__APPLE__)
++#if defined(__APPLE__) || defined(__linux__)
+         wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+ #else
+         wxSystemSettings::GetColour(wxSYS_COLOUR_MENU);

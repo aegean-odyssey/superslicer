@@ -1,0 +1,2847 @@
+From: Chow Loong Jin <hyperair@debian.org>
+Date: Tue, 29 Dec 2020 18:22:19 +0800
+Subject: Move Catch namespace into PrusaCatch
+
+This is a hack to work around Catch symbols showing up in liblog4cplus:
+https://bugs.debian.org/978617
+---
+ tests/catch2/catch.hpp                   | 651 ++++++++++++++++---------------
+ tests/catch2/catch_reporter_automake.hpp |   6 +-
+ tests/catch2/catch_reporter_tap.hpp      |   5 +-
+ tests/catch2/catch_reporter_teamcity.hpp |   6 +-
+ tests/catch2/prusa-catch-alias.hpp       |   7 +
+ tests/catch_main.hpp                     |   4 +-
+ 6 files changed, 346 insertions(+), 333 deletions(-)
+ create mode 100644 tests/catch2/prusa-catch-alias.hpp
+
+diff --git a/tests/catch2/catch.hpp b/tests/catch2/catch.hpp
+index 282d156..345c0d9 100644
+--- a/tests/catch2/catch.hpp
++++ b/tests/catch2/catch.hpp
+@@ -1,3 +1,4 @@
++#include "prusa-catch-alias.hpp"
+ /*
+  *  Catch v2.13.3
+  *  Generated: 2020-10-31 18:20:31.045274
+@@ -92,7 +93,7 @@
+ 
+ // start catch_user_interfaces.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     unsigned int rngSeed();
+ }
+ 
+@@ -476,7 +477,7 @@ namespace Catch {
+ struct Catch_global_namespace_dummy {};
+ std::ostream& operator<<(std::ostream&, Catch_global_namespace_dummy);
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct CaseSensitive { enum Choice {
+         Yes,
+@@ -519,7 +520,7 @@ namespace Catch {
+ 
+     // Bring in operator<< from global namespace into Catch namespace
+     // This is necessary because the overload of operator<< above makes
+-    // lookup stop at namespace Catch
++    // lookup stop at namespace PrusaCatch
+     using ::operator<<;
+ 
+     // Use this in variadic streaming macros to allow
+@@ -539,13 +540,13 @@ namespace Catch {
+     ::Catch::SourceLineInfo( __FILE__, static_cast<std::size_t>( __LINE__ ) )
+ 
+ // end catch_common.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct RegistrarForTagAliases {
+         RegistrarForTagAliases( char const* alias, char const* tag, SourceLineInfo const& lineInfo );
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #define CATCH_REGISTER_TAG_ALIAS( alias, spec ) \
+     CATCH_INTERNAL_START_WARNINGS_SUPPRESSION \
+@@ -560,7 +561,7 @@ namespace Catch {
+ 
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class TestSpec;
+ 
+@@ -593,7 +594,7 @@ namespace Catch {
+ #include <iosfwd>
+ #include <cassert>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     /// A non-owning string class (similar to the forthcoming std::string_view)
+     /// Note that, because a StringRef may be a substring of another string,
+@@ -675,7 +676,7 @@ namespace Catch {
+     constexpr auto operator "" _sr( char const* rawChars, std::size_t size ) noexcept -> StringRef {
+         return StringRef( rawChars, size );
+     }
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ constexpr auto operator "" _catch_sr( char const* rawChars, std::size_t size ) noexcept -> Catch::StringRef {
+     return Catch::StringRef( rawChars, size );
+@@ -915,7 +916,7 @@ constexpr auto operator "" _catch_sr( char const* rawChars, std::size_t size ) n
+ 
+ #include <type_traits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     template<typename T>
+     struct always_false : std::false_type {};
+ 
+@@ -944,14 +945,14 @@ namespace Catch {
+     using FunctionReturnType = typename std::remove_reference<typename std::remove_cv<typename std::result_of<Func(U...)>::type>::type>::type;
+ #endif
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ namespace mpl_{
+     struct na;
+ }
+ 
+ // end catch_meta.hpp
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ template<typename C>
+ class TestInvokerAsMethod : public ITestInvoker {
+@@ -983,7 +984,7 @@ struct AutoReg : NonCopyable {
+     ~AutoReg();
+ };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #if defined(CATCH_CONFIG_DISABLE)
+     #define INTERNAL_CATCH_TESTCASE_NO_REGISTRATION( TestName, ... ) \
+@@ -1342,7 +1343,7 @@ struct AutoReg : NonCopyable {
+ 
+ // start catch_result_type.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     // ResultWas::OfType enum
+     struct ResultWas { enum OfType {
+@@ -1383,10 +1384,10 @@ namespace Catch {
+     inline bool isFalseTest( int flags ) { return ( flags & ResultDisposition::FalseTest ) != 0; }
+     bool shouldSuppressFailure( int flags );
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_result_type.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct AssertionInfo
+     {
+@@ -1400,7 +1401,7 @@ namespace Catch {
+         //AssertionInfo() = delete;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_assertioninfo.h
+ // start catch_decomposer.h
+@@ -1417,7 +1418,7 @@ namespace Catch {
+ #include <cstddef>
+ #include <ostream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     std::ostream& cout();
+     std::ostream& cerr();
+@@ -1455,7 +1456,7 @@ namespace Catch {
+ 
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace Detail {
+         struct EnumInfo {
+@@ -1543,7 +1544,7 @@ inline id performOptionalSelector( id obj, SEL sel ) {
+ #pragma warning(disable:4180) // We attempt to stream a function (address) by const&, which MSVC complains about but is harmless
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Detail {
+ 
+         extern const std::string unprintableString;
+@@ -1858,7 +1859,7 @@ namespace Catch {
+     } // namespace Detail
+ #endif // __OBJC__
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ //////////////////////////////////////////////////////
+ // Separate std-lib types stringification, so it can be selectively enabled
+@@ -1875,7 +1876,7 @@ namespace Catch {
+ // Separate std::pair specialization
+ #if defined(CATCH_CONFIG_ENABLE_PAIR_STRINGMAKER)
+ #include <utility>
+-namespace Catch {
++namespace PrusaCatch {
+     template<typename T1, typename T2>
+     struct StringMaker<std::pair<T1, T2> > {
+         static std::string convert(const std::pair<T1, T2>& pair) {
+@@ -1893,7 +1894,7 @@ namespace Catch {
+ 
+ #if defined(CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER) && defined(CATCH_CONFIG_CPP17_OPTIONAL)
+ #include <optional>
+-namespace Catch {
++namespace PrusaCatch {
+     template<typename T>
+     struct StringMaker<std::optional<T> > {
+         static std::string convert(const std::optional<T>& optional) {
+@@ -1912,7 +1913,7 @@ namespace Catch {
+ // Separate std::tuple specialization
+ #if defined(CATCH_CONFIG_ENABLE_TUPLE_STRINGMAKER)
+ #include <tuple>
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Detail {
+         template<
+             typename Tuple,
+@@ -1952,7 +1953,7 @@ namespace Catch {
+ 
+ #if defined(CATCH_CONFIG_ENABLE_VARIANT_STRINGMAKER) && defined(CATCH_CONFIG_CPP17_VARIANT)
+ #include <variant>
+-namespace Catch {
++namespace PrusaCatch {
+     template<>
+     struct StringMaker<std::monostate> {
+         static std::string convert(const std::monostate&) {
+@@ -1978,7 +1979,7 @@ namespace Catch {
+ }
+ #endif // CATCH_CONFIG_ENABLE_VARIANT_STRINGMAKER
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     // Import begin/ end from std here
+     using std::begin;
+     using std::end;
+@@ -2045,7 +2046,7 @@ namespace Catch {
+         }
+     };
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // Separate std::chrono::duration specialization
+ #if defined(CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER)
+@@ -2053,7 +2054,7 @@ namespace Catch {
+ #include <ratio>
+ #include <chrono>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ template <class Ratio>
+ struct ratio_string {
+@@ -2165,7 +2166,7 @@ struct ratio_string<std::milli> {
+ #endif // CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER
+ 
+ #define INTERNAL_CATCH_REGISTER_ENUM( enumName, ... ) \
+-namespace Catch { \
++namespace PrusaCatch { \
+     template<> struct StringMaker<enumName> { \
+         static std::string convert( enumName value ) { \
+             static const auto& enumInfo = ::Catch::getMutableRegistryHub().getMutableEnumValuesRegistry().registerEnum( #enumName, #__VA_ARGS__, { __VA_ARGS__ } ); \
+@@ -2192,7 +2193,7 @@ namespace Catch { \
+ #pragma warning(disable:4800) // Forcing result to true or false
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct ITransientExpression {
+         auto isBinaryExpression() const -> bool { return m_isBinaryExpression; }
+@@ -2417,7 +2418,7 @@ namespace Catch {
+         }
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #ifdef _MSC_VER
+ #pragma warning(pop)
+@@ -2429,7 +2430,7 @@ namespace Catch {
+ #include <string>
+ #include <chrono>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class AssertionResult;
+     struct AssertionInfo;
+@@ -2511,7 +2512,7 @@ namespace Catch {
+ }
+ 
+ // end catch_interfaces_capture.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct TestFailureException{};
+     struct AssertionResultData;
+@@ -2581,7 +2582,7 @@ namespace Catch {
+ 
+     void handleExceptionMatchExpr( AssertionHandler& handler, std::string const& str, StringRef const& matcherString );
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_assertionhandler.h
+ // start catch_message.h
+@@ -2589,7 +2590,7 @@ namespace Catch {
+ #include <string>
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct MessageInfo {
+         MessageInfo(    StringRef const& _macroName,
+@@ -2666,7 +2667,7 @@ namespace Catch {
+         }
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_message.h
+ #if !defined(CATCH_CONFIG_DISABLE)
+@@ -2819,7 +2820,7 @@ namespace Catch {
+ 
+ #include <cstddef>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct Counts {
+         Counts operator - ( Counts const& other ) const;
+@@ -2850,7 +2851,7 @@ namespace Catch {
+ // end catch_totals.h
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct SectionInfo {
+         SectionInfo
+@@ -2874,14 +2875,14 @@ namespace Catch {
+         double durationInSeconds;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_section_info.h
+ // start catch_timer.h
+ 
+ #include <cstdint>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     auto getCurrentNanosecondsSinceEpoch() -> uint64_t;
+     auto getEstimatedClockResolution() -> uint64_t;
+@@ -2896,12 +2897,12 @@ namespace Catch {
+         auto getElapsedSeconds() const -> double;
+     };
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_timer.h
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class Section : NonCopyable {
+     public:
+@@ -2920,7 +2921,7 @@ namespace Catch {
+         Timer m_timer;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #define INTERNAL_CATCH_SECTION( ... ) \
+     CATCH_INTERNAL_START_WARNINGS_SUPPRESSION \
+@@ -2942,7 +2943,7 @@ namespace Catch {
+ #include <string>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class TestCase;
+     struct ITestCaseRegistry;
+@@ -2996,7 +2997,7 @@ namespace Catch {
+ #include <string>
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     using exceptionTranslateFunction = std::string(*)();
+ 
+     struct IExceptionTranslator;
+@@ -3067,7 +3068,7 @@ namespace Catch {
+ 
+ #include <type_traits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Detail {
+ 
+     class Approx {
+@@ -3181,7 +3182,7 @@ struct StringMaker<Catch::Detail::Approx> {
+     static std::string convert(Catch::Detail::Approx const& value);
+ };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_approx.h
+ // start catch_string_manip.h
+@@ -3190,7 +3191,7 @@ struct StringMaker<Catch::Detail::Approx> {
+ #include <iosfwd>
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     bool startsWith( std::string const& s, std::string const& prefix );
+     bool startsWith( std::string const& s, char prefix );
+@@ -3227,7 +3228,7 @@ namespace Catch {
+ #include <string>
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+     namespace Impl {
+ 
+@@ -3382,12 +3383,12 @@ namespace Matchers {
+ using namespace Matchers;
+ using Matchers::Impl::MatcherBase;
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers.h
+ // start catch_matchers_exception.hpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ namespace Exception {
+ 
+@@ -3409,12 +3410,12 @@ public:
+ Exception::ExceptionMessageMatcher Message(std::string const& message);
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers_exception.hpp
+ // start catch_matchers_floating.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ 
+     namespace Floating {
+@@ -3470,7 +3471,7 @@ namespace Matchers {
+     Floating::WithinRelMatcher WithinRel(float target);
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers_floating.h
+ // start catch_matchers_generic.hpp
+@@ -3478,7 +3479,7 @@ namespace Matchers {
+ #include <functional>
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ namespace Generic {
+ 
+@@ -3518,14 +3519,14 @@ public:
+     }
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers_generic.hpp
+ // start catch_matchers_string.h
+ 
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ 
+     namespace StdString {
+@@ -3587,14 +3588,14 @@ namespace Matchers {
+     StdString::RegexMatcher Matches( std::string const& regex, CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes );
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers_string.h
+ // start catch_matchers_vector.h
+ 
+ #include <algorithm>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ 
+     namespace Vector {
+@@ -3756,10 +3757,10 @@ namespace Matchers {
+     }
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers_vector.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     template<typename ArgT, typename MatcherT>
+     class MatchExpr : public ITransientExpression {
+@@ -3793,7 +3794,7 @@ namespace Catch {
+         return MatchExpr<ArgT, MatcherT>( arg, matcher, matcherString );
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ #define INTERNAL_CHECK_THAT( macroName, matcher, resultDisposition, arg ) \
+@@ -3834,7 +3835,7 @@ namespace Catch {
+ 
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace Generators {
+         class GeneratorUntypedBase {
+@@ -3858,14 +3859,14 @@ namespace Catch {
+         virtual void setGenerator( Generators::GeneratorBasePtr&& generator ) = 0;
+     };
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_interfaces_generatortracker.h
+ // start catch_enforce.h
+ 
+ #include <exception>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+     template <typename Ex>
+     [[noreturn]]
+@@ -3884,7 +3885,7 @@ namespace Catch {
+     [[noreturn]]
+     void throw_runtime_error(std::string const& msg);
+ 
+-} // namespace Catch;
++} // namespace PrusaCatch;
+ 
+ #define CATCH_MAKE_MSG(...) \
+     (Catch::ReusableStringStream() << __VA_ARGS__).str()
+@@ -3909,7 +3910,7 @@ namespace Catch {
+ #include <utility>
+ #include <exception>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ class GeneratorException : public std::exception {
+     const char* const m_msg = "";
+@@ -4090,25 +4091,25 @@ namespace Generators {
+     }
+ 
+ } // namespace Generators
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #define GENERATE( ... ) \
+     Catch::Generators::generate( INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_UNIQUE_NAME(generator)), \
+                                  CATCH_INTERNAL_LINEINFO, \
+-                                 [ ]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
++                                 [ ]{ using namespace PrusaCatch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+ #define GENERATE_COPY( ... ) \
+     Catch::Generators::generate( INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_UNIQUE_NAME(generator)), \
+                                  CATCH_INTERNAL_LINEINFO, \
+-                                 [=]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
++                                 [=]{ using namespace PrusaCatch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+ #define GENERATE_REF( ... ) \
+     Catch::Generators::generate( INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_UNIQUE_NAME(generator)), \
+                                  CATCH_INTERNAL_LINEINFO, \
+-                                 [&]{ using namespace Catch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
++                                 [&]{ using namespace PrusaCatch::Generators; return makeGenerators( __VA_ARGS__ ); } ) //NOLINT(google-build-using-namespace)
+ 
+ // end catch_generators.hpp
+ // start catch_generators_generic.hpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Generators {
+ 
+     template <typename T>
+@@ -4327,7 +4328,7 @@ namespace Generators {
+     }
+ 
+ } // namespace Generators
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_generators_generic.hpp
+ // start catch_generators_specific.hpp
+@@ -4336,7 +4337,7 @@ namespace Generators {
+ 
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct IResultCapture;
+     struct IRunner;
+@@ -4392,7 +4393,7 @@ namespace Catch {
+ 
+ // start catch_option.hpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     // An optional type
+     template<typename T>
+@@ -4452,7 +4453,7 @@ namespace Catch {
+         alignas(alignof(T)) char storage[sizeof(T)];
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_option.hpp
+ #include <chrono>
+@@ -4461,7 +4462,7 @@ namespace Catch {
+ #include <vector>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     enum class Verbosity {
+         Quiet = 0,
+@@ -4538,7 +4539,7 @@ namespace Catch {
+ 
+ #include <cstdint>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     // This is a simple implementation of C++11 Uniform Random Number
+     // Generator. It does not provide all operators, because Catch2
+@@ -4581,12 +4582,12 @@ namespace Catch {
+         static const std::uint64_t s_inc = (0x13ed0cc53f939476ULL << 1ULL) | 1ULL;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_random_number_generator.h
+ #include <random>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Generators {
+ 
+ template <typename Float>
+@@ -4738,7 +4739,7 @@ GeneratorWrapper<ResultType> from_range(Container const& cnt) {
+ }
+ 
+ } // namespace Generators
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_generators_specific.hpp
+ 
+@@ -4755,7 +4756,7 @@ GeneratorWrapper<ResultType> from_range(Container const& cnt) {
+ #pragma clang diagnostic ignored "-Wpadded"
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct ITestInvoker;
+ 
+@@ -4825,7 +4826,7 @@ namespace Catch {
+ // end catch_test_case_info.h
+ // start catch_interfaces_runner.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct IRunner {
+         virtual ~IRunner();
+@@ -4858,7 +4859,7 @@ namespace Catch {
+ 
+ @end
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class OcMethod : public ITestInvoker {
+ 
+@@ -5019,7 +5020,7 @@ namespace Catch {
+ 
+ #endif // CATCH_CONFIG_DISABLE_MATCHERS
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ #define OC_MAKE_UNIQUE_NAME( root, uniqueSuffix ) root##uniqueSuffix
+@@ -5065,7 +5066,7 @@ return @ desc; \
+ 
+ // start catch_wildcard_pattern.h
+ 
+-namespace Catch
++namespace PrusaCatch
+ {
+     class WildcardPattern {
+         enum WildcardPosition {
+@@ -5094,7 +5095,7 @@ namespace Catch
+ #include <vector>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct IConfig;
+ 
+@@ -5170,7 +5171,7 @@ namespace Catch {
+ 
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct TagAlias;
+ 
+@@ -5183,10 +5184,10 @@ namespace Catch {
+         static ITagAliasRegistry const& get();
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_interfaces_tag_alias_registry.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class TestSpecParser {
+         enum Mode{ None, Name, QuotedName, Tag, EscapedName };
+@@ -5239,7 +5240,7 @@ namespace Catch {
+     };
+     TestSpec parseTestSpec( std::string const& arg );
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #ifdef __clang__
+ #pragma clang diagnostic pop
+@@ -5256,7 +5257,7 @@ namespace Catch {
+ #define CATCH_CONFIG_CONSOLE_WIDTH 80
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct IStream;
+ 
+@@ -5361,14 +5362,14 @@ namespace Catch {
+         bool m_hasTestFilters = false;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_config.hpp
+ // start catch_assertionresult.h
+ 
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct AssertionResultData
+     {
+@@ -5407,7 +5408,7 @@ namespace Catch {
+         AssertionResultData m_resultData;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_assertionresult.h
+ #if defined(CATCH_CONFIG_ENABLE_BENCHMARKING)
+@@ -5416,7 +5417,7 @@ namespace Catch {
+  // Statistics estimates
+ 
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         template <typename Duration>
+         struct Estimate {
+@@ -5431,14 +5432,14 @@ namespace Catch {
+             }
+         };
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_estimate.hpp
+ // start catch_outlier_classification.hpp
+ 
+ // Outlier information
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         struct OutlierClassification {
+             int samples_seen = 0;
+@@ -5452,7 +5453,7 @@ namespace Catch {
+             }
+         };
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_outlier_classification.hpp
+ #endif // CATCH_CONFIG_ENABLE_BENCHMARKING
+@@ -5464,7 +5465,7 @@ namespace Catch {
+ #include <memory>
+ #include <algorithm>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct ReporterConfig {
+         explicit ReporterConfig( IConfigPtr const& _fullConfig );
+@@ -5698,7 +5699,7 @@ namespace Catch {
+         virtual Listeners const& getListeners() const = 0;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_interfaces_reporter.h
+ #include <algorithm>
+@@ -5709,7 +5710,7 @@ namespace Catch {
+ #include <memory>
+ #include <ostream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     void prepareExpandedExpression(AssertionResult& result);
+ 
+     // Returns double formatted as %.3f (format expected on output)
+@@ -5968,12 +5969,12 @@ namespace Catch {
+         bool assertionEnded(AssertionStats const&) override;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_reporter_bases.hpp
+ // start catch_console_colour.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct Colour {
+         enum Code {
+@@ -6027,13 +6028,13 @@ namespace Catch {
+ 
+     std::ostream& operator << ( std::ostream& os, Colour const& );
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_console_colour.h
+ // start catch_reporter_registrars.hpp
+ 
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     template<typename T>
+     class ReporterRegistrar {
+@@ -6101,7 +6102,7 @@ namespace Catch {
+ // Allow users to base their work off existing reporters
+ // start catch_reporter_compact.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct CompactReporter : StreamingReporterBase<CompactReporter> {
+ 
+@@ -6123,7 +6124,7 @@ namespace Catch {
+ 
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_reporter_compact.h
+ // start catch_reporter_console.h
+@@ -6135,7 +6136,7 @@ namespace Catch {
+                               // and default is missing) is enabled
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     // Fwd decls
+     struct SummaryColumn;
+     class TablePrinter;
+@@ -6196,7 +6197,7 @@ namespace Catch {
+         bool m_headerPrinted = false;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #if defined(_MSC_VER)
+ #pragma warning(pop)
+@@ -6209,7 +6210,7 @@ namespace Catch {
+ 
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     enum class XmlFormatting {
+         None = 0x00,
+         Indent = 0x01,
+@@ -6310,7 +6311,7 @@ namespace Catch {
+ }
+ 
+ // end catch_xmlwriter.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class JunitReporter : public CumulativeReporterBase<JunitReporter> {
+     public:
+@@ -6354,12 +6355,12 @@ namespace Catch {
+         bool m_okToFail = false;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_reporter_junit.h
+ // start catch_reporter_xml.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     class XmlReporter : public StreamingReporterBase<XmlReporter> {
+     public:
+         XmlReporter(ReporterConfig const& _config);
+@@ -6409,7 +6410,7 @@ namespace Catch {
+         int m_sectionDepth = 0;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_reporter_xml.h
+ 
+@@ -6440,7 +6441,7 @@ namespace Catch {
+ #include <chrono>
+ #include <ratio>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         template <typename Clock>
+         using ClockDuration = typename Clock::duration;
+@@ -6461,7 +6462,7 @@ namespace Catch {
+ 
+         using fp_seconds = std::chrono::duration<double, std::ratio<1>>;
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_clock.hpp
+ // start catch_optimizer.hpp
+@@ -6473,7 +6474,7 @@ namespace Catch {
+ #   include <atomic> // atomic_thread_fence
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+ #if defined(__GNUC__) || defined(__clang__)
+         template <typename T>
+@@ -6521,7 +6522,7 @@ namespace Catch {
+             std::forward<Fn>(fn) (std::forward<Args...>(args...));
+         }
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_optimizer.hpp
+ // start catch_complete_invoke.hpp
+@@ -6532,7 +6533,7 @@ namespace Catch {
+ #include <type_traits>
+ #include <utility>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename T>
+@@ -6578,10 +6579,10 @@ namespace Catch {
+             }
+         }
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_complete_invoke.hpp
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             struct ChronometerConcept {
+@@ -6631,7 +6632,7 @@ namespace Catch {
+             int k;
+         };
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_chronometer.hpp
+ // start catch_environment.hpp
+@@ -6639,7 +6640,7 @@ namespace Catch {
+ // Environment information
+ 
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         template <typename Duration>
+         struct EnvironmentEstimate {
+@@ -6658,7 +6659,7 @@ namespace Catch {
+             EnvironmentEstimate<FloatDuration<Clock>> clock_cost;
+         };
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_environment.hpp
+ // start catch_execution_plan.hpp
+@@ -6676,7 +6677,7 @@ namespace Catch {
+ #include <utility>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename T>
+@@ -6756,7 +6757,7 @@ namespace Catch {
+             };
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_benchmark_function.hpp
+ // start catch_repeat.hpp
+@@ -6767,7 +6768,7 @@ namespace Catch {
+ #include <type_traits>
+ #include <utility>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename Fun>
+@@ -6785,7 +6786,7 @@ namespace Catch {
+             }
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_repeat.hpp
+ // start catch_run_for_at_least.hpp
+@@ -6806,7 +6807,7 @@ namespace Catch {
+ #include <tuple>
+ #include <type_traits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         template <typename Duration, typename Result>
+         struct Timing {
+@@ -6817,12 +6818,12 @@ namespace Catch {
+         template <typename Clock, typename Func, typename... Args>
+         using TimingOf = Timing<ClockDuration<Clock>, Detail::CompleteType_t<FunctionReturnType<Func, Args...>>>;
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_timing.hpp
+ #include <utility>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename Clock, typename Fun, typename... Args>
+@@ -6835,13 +6836,13 @@ namespace Catch {
+             }
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_measure.hpp
+ #include <utility>
+ #include <type_traits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename Clock, typename Fun>
+@@ -6880,12 +6881,12 @@ namespace Catch {
+             }
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_run_for_at_least.hpp
+ #include <algorithm>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         template <typename Duration>
+         struct ExecutionPlan {
+@@ -6918,7 +6919,7 @@ namespace Catch {
+             }
+         };
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_execution_plan.hpp
+ // start catch_estimate_clock.hpp
+@@ -6942,7 +6943,7 @@ namespace Catch {
+ #include <cstddef>
+ #include <random>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             using sample = std::vector<double>;
+@@ -7071,7 +7072,7 @@ namespace Catch {
+             bootstrap_analysis analyse_samples(double confidence_level, int n_resamples, std::vector<double>::iterator first, std::vector<double>::iterator last);
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_stats.hpp
+ #include <algorithm>
+@@ -7080,7 +7081,7 @@ namespace Catch {
+ #include <vector>
+ #include <cmath>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename Clock>
+@@ -7164,7 +7165,7 @@ namespace Catch {
+             }
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_estimate_clock.hpp
+ // start catch_analyse.hpp
+@@ -7182,7 +7183,7 @@ namespace Catch {
+ #include <string>
+ #include <iterator>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         template <typename Duration>
+         struct SampleAnalysis {
+@@ -7207,14 +7208,14 @@ namespace Catch {
+             }
+         };
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_sample_analysis.hpp
+ #include <algorithm>
+ #include <iterator>
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename Duration, typename Iterator>
+@@ -7268,7 +7269,7 @@ namespace Catch {
+             }
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_analyse.hpp
+ #include <algorithm>
+@@ -7277,7 +7278,7 @@ namespace Catch {
+ #include <vector>
+ #include <cmath>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         struct Benchmark {
+             Benchmark(std::string &&name)
+@@ -7352,7 +7353,7 @@ namespace Catch {
+             std::string name;
+         };
+     }
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #define INTERNAL_CATCH_GET_1_ARG(arg1, arg2, ...) arg1
+ #define INTERNAL_CATCH_GET_2_ARG(arg1, arg2, ...) arg2
+@@ -7373,7 +7374,7 @@ namespace Catch {
+ 
+ #include <type_traits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+             template <typename T, bool Destruct>
+@@ -7456,7 +7457,7 @@ namespace Catch {
+ #include <vector>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace TestCaseTracking {
+ 
+     struct NameAndLocation {
+@@ -7614,13 +7615,13 @@ using TestCaseTracking::ITracker;
+ using TestCaseTracking::TrackerContext;
+ using TestCaseTracking::SectionTracker;
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_test_case_tracker.h
+ 
+ // start catch_leak_detector.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct LeakDetector {
+         LeakDetector();
+@@ -7730,7 +7731,7 @@ namespace {
+ 
+ }
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace Benchmark {
+         namespace Detail {
+ 
+@@ -7837,7 +7838,7 @@ namespace Catch {
+             }
+         } // namespace Detail
+     } // namespace Benchmark
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #endif // CATCH_CONFIG_ENABLE_BENCHMARKING
+ // end catch_stats.cpp
+@@ -7856,7 +7857,7 @@ bool marginComparison(double lhs, double rhs, double margin) {
+ 
+ }
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Detail {
+ 
+     Approx::Approx ( double value )
+@@ -7918,13 +7919,13 @@ std::string StringMaker<Catch::Detail::Approx>::convert(Catch::Detail::Approx co
+     return value.toString();
+ }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_approx.cpp
+ // start catch_assertionhandler.cpp
+ 
+ // start catch_debugger.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     bool isDebuggerActive();
+ }
+ 
+@@ -8012,7 +8013,7 @@ namespace Catch {
+ // end catch_windows_h_proxy.h
+ #if defined( CATCH_CONFIG_WINDOWS_SEH )
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct FatalConditionHandler {
+ 
+@@ -8027,13 +8028,13 @@ namespace Catch {
+         static PVOID exceptionHandlerHandle;
+     };
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #elif defined ( CATCH_CONFIG_POSIX_SIGNALS )
+ 
+ #include <signal.h>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct FatalConditionHandler {
+ 
+@@ -8049,11 +8050,11 @@ namespace Catch {
+         static void reset();
+     };
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #else
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     struct FatalConditionHandler {
+         void reset();
+     };
+@@ -8064,7 +8065,7 @@ namespace Catch {
+ // end catch_fatal_condition.h
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct IMutableContext;
+ 
+@@ -8192,10 +8193,10 @@ namespace Catch {
+ 
+     void seedRng(IConfig const& config);
+     unsigned int rngSeed();
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_run_context.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         auto operator <<( std::ostream& os, ITransientExpression const& expr ) -> std::ostream& {
+@@ -8297,11 +8298,11 @@ namespace Catch {
+         handleExceptionMatchExpr( handler, Matchers::Equals( str ), matcherString );
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_assertionhandler.cpp
+ // start catch_assertionresult.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     AssertionResultData::AssertionResultData(ResultWas::OfType _resultType, LazyExpression const & _lazyExpression):
+         lazyExpression(_lazyExpression),
+         resultType(_resultType) {}
+@@ -8394,11 +8395,11 @@ namespace Catch {
+         return m_info.macroName;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_assertionresult.cpp
+ // start catch_capture_matchers.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     using StringMatcher = Matchers::Impl::MatcherBase<std::string>;
+ 
+@@ -8411,7 +8412,7 @@ namespace Catch {
+         handler.handleExpr( expr );
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_capture_matchers.cpp
+ // start catch_commandline.cpp
+ 
+@@ -8482,7 +8483,7 @@ namespace Catch {
+ #define CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH 80
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace clara {
+ namespace TextFlow {
+ 
+@@ -8812,7 +8813,7 @@ inline auto Column::operator + (Column const& other) -> Columns {
+ #define CATCH_PLATFORM_WINDOWS
+ #endif
+ 
+-namespace Catch { namespace clara {
++namespace PrusaCatch { namespace clara {
+ namespace detail {
+ 
+     // Traits for extracting arg and return type of lambdas (for single argument lambdas)
+@@ -9686,7 +9687,7 @@ using detail::ParseResultType;
+ // Result type for parser operation
+ using detail::ParserResult;
+ 
+-}} // namespace Catch::clara
++}} // namespace PrusaCatch::clara
+ 
+ // end clara.hpp
+ #ifdef __clang__
+@@ -9700,17 +9701,17 @@ using detail::ParserResult;
+ #endif
+ 
+ // end catch_clara.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     clara::Parser makeCommandLineParser( ConfigData& config );
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_commandline.h
+ #include <fstream>
+ #include <ctime>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     clara::Parser makeCommandLineParser( ConfigData& config ) {
+ 
+@@ -9921,14 +9922,14 @@ namespace Catch {
+         return cli;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_commandline.cpp
+ // start catch_common.cpp
+ 
+ #include <cstring>
+ #include <ostream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     bool SourceLineInfo::operator == ( SourceLineInfo const& other ) const noexcept {
+         return line == other.line && (file == other.file || std::strcmp(file, other.file) == 0);
+@@ -9959,7 +9960,7 @@ namespace Catch {
+ // end catch_common.cpp
+ // start catch_config.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     Config::Config( ConfigData const& data )
+     :   m_data( data ),
+@@ -10033,7 +10034,7 @@ namespace Catch {
+         return Catch::makeStream(m_data.outputFilename);
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_config.cpp
+ // start catch_console_colour.cpp
+ 
+@@ -10044,7 +10045,7 @@ namespace Catch {
+ 
+ // start catch_errno_guard.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class ErrnoGuard {
+     public:
+@@ -10059,7 +10060,7 @@ namespace Catch {
+ // end catch_errno_guard.h
+ #include <sstream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     namespace {
+ 
+         struct IColourImpl {
+@@ -10077,7 +10078,7 @@ namespace Catch {
+         };
+ 
+     } // anon namespace
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #if !defined( CATCH_CONFIG_COLOUR_NONE ) && !defined( CATCH_CONFIG_COLOUR_WINDOWS ) && !defined( CATCH_CONFIG_COLOUR_ANSI )
+ #   ifdef CATCH_PLATFORM_WINDOWS
+@@ -10089,7 +10090,7 @@ namespace Catch {
+ 
+ #if defined ( CATCH_CONFIG_COLOUR_WINDOWS ) /////////////////////////////////////////
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace {
+ 
+     class Win32ColourImpl : public IColourImpl {
+@@ -10150,13 +10151,13 @@ namespace {
+     }
+ 
+ } // end anon namespace
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #elif defined( CATCH_CONFIG_COLOUR_ANSI ) //////////////////////////////////////
+ 
+ #include <unistd.h>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace {
+ 
+     // use POSIX/ ANSI console terminal codes
+@@ -10226,19 +10227,19 @@ namespace {
+     }
+ 
+ } // end anon namespace
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #else  // not Windows or ANSI ///////////////////////////////////////////////
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     static IColourImpl* platformColourInstance() { return NoColourImpl::instance(); }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #endif // Windows/ ANSI/ None
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     Colour::Colour( Code _colourCode ) { use( _colourCode ); }
+     Colour::Colour( Colour&& other ) noexcept {
+@@ -10268,7 +10269,7 @@ namespace Catch {
+         return os;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #if defined(__clang__)
+ #    pragma clang diagnostic pop
+@@ -10277,7 +10278,7 @@ namespace Catch {
+ // end catch_console_colour.cpp
+ // start catch_context.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class Context : public IMutableContext, NonCopyable {
+ 
+@@ -10342,7 +10343,7 @@ namespace Catch {
+ 
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     void writeToDebugConsole( std::string const& text );
+ }
+ 
+@@ -10350,7 +10351,7 @@ namespace Catch {
+ #if defined(CATCH_CONFIG_ANDROID_LOGWRITE)
+ #include <android/log.h>
+ 
+-    namespace Catch {
++    namespace PrusaCatch {
+         void writeToDebugConsole( std::string const& text ) {
+             __android_log_write( ANDROID_LOG_DEBUG, "Catch", text.c_str() );
+         }
+@@ -10358,7 +10359,7 @@ namespace Catch {
+ 
+ #elif defined(CATCH_PLATFORM_WINDOWS)
+ 
+-    namespace Catch {
++    namespace PrusaCatch {
+         void writeToDebugConsole( std::string const& text ) {
+             ::OutputDebugStringA( text.c_str() );
+         }
+@@ -10366,7 +10367,7 @@ namespace Catch {
+ 
+ #else
+ 
+-    namespace Catch {
++    namespace PrusaCatch {
+         void writeToDebugConsole( std::string const& text ) {
+             // !TBD: Need a version for Mac/ XCode and other IDEs
+             Catch::cout() << text;
+@@ -10391,7 +10392,7 @@ namespace Catch {
+ #  include <sys/sysctl.h>
+ #endif
+ 
+-    namespace Catch {
++    namespace PrusaCatch {
+         #ifdef __apple_build_version__
+         // The following function is taken directly from the following technical note:
+         // https://developer.apple.com/library/archive/qa/qa1361/_index.html
+@@ -10434,13 +10435,13 @@ namespace Catch {
+             return false;
+         }
+         #endif
+-    } // namespace Catch
++    } // namespace PrusaCatch
+ 
+ #elif defined(CATCH_PLATFORM_LINUX)
+     #include <fstream>
+     #include <string>
+ 
+-    namespace Catch{
++    namespace PrusaCatch{
+         // The standard POSIX way of detecting a debugger is to attempt to
+         // ptrace() the process, but this needs to be done from a child and not
+         // this process itself to still allow attaching to this process later
+@@ -10465,30 +10466,30 @@ namespace Catch {
+ 
+             return false;
+         }
+-    } // namespace Catch
++    } // namespace PrusaCatch
+ #elif defined(_MSC_VER)
+     extern "C" __declspec(dllimport) int __stdcall IsDebuggerPresent();
+-    namespace Catch {
++    namespace PrusaCatch {
+         bool isDebuggerActive() {
+             return IsDebuggerPresent() != 0;
+         }
+     }
+ #elif defined(__MINGW32__)
+     extern "C" __declspec(dllimport) int __stdcall IsDebuggerPresent();
+-    namespace Catch {
++    namespace PrusaCatch {
+         bool isDebuggerActive() {
+             return IsDebuggerPresent() != 0;
+         }
+     }
+ #else
+-    namespace Catch {
++    namespace PrusaCatch {
+        bool isDebuggerActive() { return false; }
+     }
+ #endif // Platform
+ // end catch_debugger.cpp
+ // start catch_decomposer.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     ITransientExpression::~ITransientExpression() = default;
+ 
+@@ -10506,7 +10507,7 @@ namespace Catch {
+ 
+ #include <stdexcept>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ #if defined(CATCH_CONFIG_DISABLE_EXCEPTIONS) && !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS_CUSTOM_HANDLER)
+     [[noreturn]]
+     void throw_exception(std::exception const& e) {
+@@ -10531,7 +10532,7 @@ namespace Catch {
+         throw_exception(std::runtime_error(msg));
+     }
+ 
+-} // namespace Catch;
++} // namespace PrusaCatch;
+ // end catch_enforce.cpp
+ // start catch_enum_values_registry.cpp
+ // start catch_enum_values_registry.h
+@@ -10539,7 +10540,7 @@ namespace Catch {
+ #include <vector>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace Detail {
+ 
+@@ -10563,7 +10564,7 @@ namespace Catch {
+ #include <map>
+ #include <cassert>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     IMutableEnumValuesRegistry::~IMutableEnumValuesRegistry() {}
+ 
+@@ -10629,7 +10630,7 @@ namespace Catch {
+ 
+ #include <cerrno>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+         ErrnoGuard::ErrnoGuard():m_oldErrno(errno){}
+         ErrnoGuard::~ErrnoGuard() { errno = m_oldErrno; }
+ }
+@@ -10642,7 +10643,7 @@ namespace Catch {
+ #include <string>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class ExceptionTranslatorRegistry : public IExceptionTranslatorRegistry {
+     public:
+@@ -10661,7 +10662,7 @@ namespace Catch {
+ #import "Foundation/Foundation.h"
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     ExceptionTranslatorRegistry::~ExceptionTranslatorRegistry() {
+     }
+@@ -10753,7 +10754,7 @@ namespace {
+ 
+ #if defined( CATCH_CONFIG_WINDOWS_SEH )
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     struct SignalDefs { DWORD id; const char* name; };
+ 
+     // There is no 1-1 mapping between signals and windows exceptions.
+@@ -10806,11 +10807,11 @@ bool FatalConditionHandler::isSet = false;
+ ULONG FatalConditionHandler::guaranteeSize = 0;
+ PVOID FatalConditionHandler::exceptionHandlerHandle = nullptr;
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #elif defined( CATCH_CONFIG_POSIX_SIGNALS )
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct SignalDefs {
+         int id;
+@@ -10880,11 +10881,11 @@ namespace Catch {
+     stack_t FatalConditionHandler::oldSigStack = {};
+     char FatalConditionHandler::altStackMem[sigStackSize] = {};
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #else
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     void FatalConditionHandler::reset() {}
+ }
+ 
+@@ -10899,7 +10900,7 @@ namespace Catch {
+ #include <limits>
+ #include <set>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ IGeneratorTracker::~IGeneratorTracker() {}
+ 
+@@ -10916,30 +10917,30 @@ namespace Generators {
+     }
+ 
+ } // namespace Generators
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_generators.cpp
+ // start catch_interfaces_capture.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     IResultCapture::~IResultCapture() = default;
+ }
+ // end catch_interfaces_capture.cpp
+ // start catch_interfaces_config.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     IConfig::~IConfig() = default;
+ }
+ // end catch_interfaces_config.cpp
+ // start catch_interfaces_exception.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     IExceptionTranslator::~IExceptionTranslator() = default;
+     IExceptionTranslatorRegistry::~IExceptionTranslatorRegistry() = default;
+ }
+ // end catch_interfaces_exception.cpp
+ // start catch_interfaces_registry_hub.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     IRegistryHub::~IRegistryHub() = default;
+     IMutableRegistryHub::~IMutableRegistryHub() = default;
+ }
+@@ -10948,7 +10949,7 @@ namespace Catch {
+ 
+ // start catch_reporter_listening.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class ListeningReporter : public IStreamingReporter {
+         using Reporters = std::vector<IStreamingReporterPtr>;
+@@ -10997,10 +10998,10 @@ namespace Catch {
+ 
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_reporter_listening.h
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     ReporterConfig::ReporterConfig( IConfigPtr const& _fullConfig )
+     :   m_stream( &_fullConfig->stream() ), m_fullConfig( _fullConfig ) {}
+@@ -11100,17 +11101,17 @@ namespace Catch {
+     IReporterFactory::~IReporterFactory() = default;
+     IReporterRegistry::~IReporterRegistry() = default;
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_interfaces_reporter.cpp
+ // start catch_interfaces_runner.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     IRunner::~IRunner() = default;
+ }
+ // end catch_interfaces_runner.cpp
+ // start catch_interfaces_testcase.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     ITestInvoker::~ITestInvoker() = default;
+     ITestCaseRegistry::~ITestCaseRegistry() = default;
+ }
+@@ -11120,7 +11121,7 @@ namespace Catch {
+ #ifdef CATCH_CONFIG_WINDOWS_CRTDBG
+ #include <crtdbg.h>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     LeakDetector::LeakDetector() {
+         int flag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+@@ -11150,7 +11151,7 @@ Catch::LeakDetector::~LeakDetector() {
+ 
+ #include <set>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     std::size_t listTests( Config const& config );
+ 
+@@ -11170,12 +11171,12 @@ namespace Catch {
+ 
+     Option<std::size_t> list( std::shared_ptr<Config> const& config );
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_list.h
+ // start catch_text.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     using namespace clara::TextFlow;
+ }
+ 
+@@ -11184,7 +11185,7 @@ namespace Catch {
+ #include <algorithm>
+ #include <iomanip>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     std::size_t listTests( Config const& config ) {
+         TestSpec const& testSpec = config.testSpec();
+@@ -11329,11 +11330,11 @@ namespace Catch {
+         return listedCount;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_list.cpp
+ // start catch_matchers.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+     namespace Impl {
+ 
+@@ -11351,11 +11352,11 @@ namespace Matchers {
+ using namespace Matchers;
+ using Matchers::Impl::MatcherBase;
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_matchers.cpp
+ // start catch_matchers_exception.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ namespace Exception {
+ 
+@@ -11374,13 +11375,13 @@ Exception::ExceptionMessageMatcher Message(std::string const& message) {
+ 
+ // namespace Exception
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_matchers_exception.cpp
+ // start catch_matchers_floating.cpp
+ 
+ // start catch_polyfills.hpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     bool isnan(float f);
+     bool isnan(double d);
+ }
+@@ -11390,7 +11391,7 @@ namespace Catch {
+ 
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     template <typename T>
+     std::string to_string(T const& t) {
+ #if defined(CATCH_CONFIG_CPP11_TO_STRING)
+@@ -11401,7 +11402,7 @@ namespace Catch {
+         return rss.str();
+ #endif
+     }
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_to_string.hpp
+ #include <algorithm>
+@@ -11414,7 +11415,7 @@ namespace Catch {
+ #include <iomanip>
+ #include <limits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace {
+ 
+     int32_t convert(float f) {
+@@ -11620,7 +11621,7 @@ Floating::WithinRelMatcher WithinRel(float target) {
+ }
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_matchers_floating.cpp
+ // start catch_matchers_generic.cpp
+@@ -11637,7 +11638,7 @@ std::string Catch::Matchers::Generic::Detail::finalizeDescription(const std::str
+ 
+ #include <regex>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace Matchers {
+ 
+     namespace StdString {
+@@ -11733,21 +11734,21 @@ namespace Matchers {
+     }
+ 
+ } // namespace Matchers
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_matchers_string.cpp
+ // start catch_message.cpp
+ 
+ // start catch_uncaught_exceptions.h
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     bool uncaught_exceptions();
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_uncaught_exceptions.h
+ #include <cassert>
+ #include <stack>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     MessageInfo::MessageInfo(   StringRef const& _macroName,
+                                 SourceLineInfo const& _lineInfo,
+@@ -11869,7 +11870,7 @@ namespace Catch {
+         m_captured++;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_message.cpp
+ // start catch_output_redirect.cpp
+ 
+@@ -11881,7 +11882,7 @@ namespace Catch {
+ #include <iosfwd>
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class RedirectedStream {
+         std::ostream& m_originalStream;
+@@ -11976,7 +11977,7 @@ namespace Catch {
+ 
+ #endif
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #endif // TWOBLUECUBES_CATCH_OUTPUT_REDIRECT_H
+ // end catch_output_redirect.h
+@@ -11997,7 +11998,7 @@ namespace Catch {
+     #endif
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     RedirectedStream::RedirectedStream( std::ostream& originalStream, std::ostream& redirectionStream )
+     :   m_originalStream( originalStream ),
+@@ -12106,7 +12107,7 @@ namespace Catch {
+ 
+ #endif // CATCH_CONFIG_NEW_CAPTURE
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #if defined(CATCH_CONFIG_NEW_CAPTURE)
+     #if defined(_MSC_VER)
+@@ -12120,7 +12121,7 @@ namespace Catch {
+ 
+ #include <cmath>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ #if !defined(CATCH_CONFIG_POLYFILL_ISNAN)
+     bool isnan(float f) {
+@@ -12139,11 +12140,11 @@ namespace Catch {
+     }
+ #endif
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_polyfills.cpp
+ // start catch_random_number_generator.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ namespace {
+ 
+@@ -12212,7 +12213,7 @@ namespace {
+ #include <algorithm>
+ #include <ios>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class TestCase;
+     struct IConfig;
+@@ -12258,14 +12259,14 @@ namespace Catch {
+ 
+     ///////////////////////////////////////////////////////////////////////////
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_test_case_registry_impl.h
+ // start catch_reporter_registry.h
+ 
+ #include <map>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class ReporterRegistry : public IReporterRegistry {
+ 
+@@ -12294,7 +12295,7 @@ namespace Catch {
+ 
+ #include <string>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct TagAlias {
+         TagAlias(std::string const& _tag, SourceLineInfo _lineInfo);
+@@ -12303,12 +12304,12 @@ namespace Catch {
+         SourceLineInfo lineInfo;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_tag_alias.h
+ #include <map>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class TagAliasRegistry : public ITagAliasRegistry {
+     public:
+@@ -12321,7 +12322,7 @@ namespace Catch {
+         std::map<std::string, TagAlias> m_registry;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_tag_alias_registry.h
+ // start catch_startup_exception_registry.h
+@@ -12329,7 +12330,7 @@ namespace Catch {
+ #include <vector>
+ #include <exception>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class StartupExceptionRegistry {
+ #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+@@ -12341,12 +12342,12 @@ namespace Catch {
+ #endif
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_startup_exception_registry.h
+ // start catch_singletons.hpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct ISingleton {
+         virtual ~ISingleton();
+@@ -12376,10 +12377,10 @@ namespace Catch {
+         }
+     };
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ // end catch_singletons.hpp
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+ 
+@@ -12457,11 +12458,11 @@ namespace Catch {
+         return getRegistryHub().getExceptionTranslatorRegistry().translateActiveException();
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_registry_hub.cpp
+ // start catch_reporter_registry.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     ReporterRegistry::~ReporterRegistry() = default;
+ 
+@@ -12490,7 +12491,7 @@ namespace Catch {
+ // end catch_reporter_registry.cpp
+ // start catch_result_type.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     bool isOk( ResultWas::OfType resultType ) {
+         return ( resultType & ResultWas::FailureBit ) == 0;
+@@ -12506,7 +12507,7 @@ namespace Catch {
+     bool shouldContinueOnFailure( int flags )    { return ( flags & ResultDisposition::ContinueOnFailure ) != 0; }
+     bool shouldSuppressFailure( int flags )      { return ( flags & ResultDisposition::SuppressFail ) != 0; }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_result_type.cpp
+ // start catch_run_context.cpp
+ 
+@@ -12514,7 +12515,7 @@ namespace Catch {
+ #include <algorithm>
+ #include <sstream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace Generators {
+         struct GeneratorTracker : TestCaseTracking::TrackerBase, IGeneratorTracker {
+@@ -13099,7 +13100,7 @@ namespace Catch {
+ // end catch_run_context.cpp
+ // start catch_section.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     Section::Section( SectionInfo const& info )
+     :   m_info( info ),
+@@ -13123,11 +13124,11 @@ namespace Catch {
+         return m_sectionIncluded;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_section.cpp
+ // start catch_section_info.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     SectionInfo::SectionInfo
+         (   SourceLineInfo const& _lineInfo,
+@@ -13136,7 +13137,7 @@ namespace Catch {
+         lineInfo( _lineInfo )
+     {}
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_section_info.cpp
+ // start catch_session.cpp
+ 
+@@ -13144,7 +13145,7 @@ namespace Catch {
+ 
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     class Session : NonCopyable {
+     public:
+@@ -13187,14 +13188,14 @@ namespace Catch {
+         bool m_startupExceptions = false;
+     };
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ // end catch_session.h
+ // start catch_version.h
+ 
+ #include <iosfwd>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     // Versioning information
+     struct Version {
+@@ -13226,7 +13227,7 @@ namespace Catch {
+ #include <set>
+ #include <iterator>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         const int MaxExitCode = 255;
+@@ -13508,13 +13509,13 @@ namespace Catch {
+ #endif
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_session.cpp
+ // start catch_singletons.cpp
+ 
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         static auto getSingletons() -> std::vector<ISingleton*>*& {
+@@ -13538,12 +13539,12 @@ namespace Catch {
+         singletons = nullptr;
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_singletons.cpp
+ // start catch_startup_exception_registry.cpp
+ 
+ #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+-namespace Catch {
++namespace PrusaCatch {
+ void StartupExceptionRegistry::add( std::exception_ptr const& exception ) noexcept {
+         CATCH_TRY {
+             m_exceptions.push_back(exception);
+@@ -13557,7 +13558,7 @@ void StartupExceptionRegistry::add( std::exception_ptr const& exception ) noexce
+         return m_exceptions;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ #endif
+ // end catch_startup_exception_registry.cpp
+ // start catch_stream.cpp
+@@ -13569,7 +13570,7 @@ void StartupExceptionRegistry::add( std::exception_ptr const& exception ) noexce
+ #include <vector>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     Catch::IStream::~IStream() = default;
+ 
+@@ -13739,7 +13740,7 @@ namespace Catch {
+ #include <cctype>
+ #include <vector>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         char toLowerCh(char c) {
+@@ -13840,7 +13841,7 @@ namespace Catch {
+ #include <cstring>
+ #include <cstdint>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     StringRef::StringRef( char const* rawChars ) noexcept
+     : StringRef( rawChars, static_cast<StringRef::size_type>(std::strlen(rawChars) ) )
+     {}
+@@ -13874,17 +13875,17 @@ namespace Catch {
+         return lhs;
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_stringref.cpp
+ // start catch_tag_alias.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     TagAlias::TagAlias(std::string const & _tag, SourceLineInfo _lineInfo): tag(_tag), lineInfo(_lineInfo) {}
+ }
+ // end catch_tag_alias.cpp
+ // start catch_tag_alias_autoregistrar.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     RegistrarForTagAliases::RegistrarForTagAliases(char const* alias, char const* tag, SourceLineInfo const& lineInfo) {
+         CATCH_TRY {
+@@ -13901,7 +13902,7 @@ namespace Catch {
+ 
+ #include <sstream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     TagAliasRegistry::~TagAliasRegistry() {}
+ 
+@@ -13942,7 +13943,7 @@ namespace Catch {
+         return getRegistryHub().getTagAliasRegistry();
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_tag_alias_registry.cpp
+ // start catch_test_case_info.cpp
+ 
+@@ -13951,7 +13952,7 @@ namespace Catch {
+ #include <algorithm>
+ #include <sstream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         TestCaseInfo::SpecialProperties parseSpecialTag( std::string const& tag ) {
+@@ -14115,14 +14116,14 @@ namespace Catch {
+         return *this;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_test_case_info.cpp
+ // start catch_test_case_registry_impl.cpp
+ 
+ #include <algorithm>
+ #include <sstream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         struct TestHasher {
+@@ -14270,7 +14271,7 @@ namespace Catch {
+         return className;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_test_case_registry_impl.cpp
+ // start catch_test_case_tracker.cpp
+ 
+@@ -14285,7 +14286,7 @@ namespace Catch {
+ #    pragma clang diagnostic ignored "-Wexit-time-destructors"
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace TestCaseTracking {
+ 
+     NameAndLocation::NameAndLocation( std::string const& _name, SourceLineInfo const& _location )
+@@ -14507,7 +14508,7 @@ using TestCaseTracking::ITracker;
+ using TestCaseTracking::TrackerContext;
+ using TestCaseTracking::SectionTracker;
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #if defined(__clang__)
+ #    pragma clang diagnostic pop
+@@ -14515,7 +14516,7 @@ using TestCaseTracking::SectionTracker;
+ // end catch_test_case_tracker.cpp
+ // start catch_test_registry.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     auto makeTestInvoker( void(*testAsFunction)() ) noexcept -> ITestInvoker* {
+         return new(std::nothrow) TestInvokerAsFunction( testAsFunction );
+@@ -14548,7 +14549,7 @@ namespace Catch {
+ #include <vector>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     TestSpec::Pattern::Pattern( std::string const& name )
+     : m_name( name )
+@@ -14629,7 +14630,7 @@ namespace Catch {
+ // end catch_test_spec.cpp
+ // start catch_test_spec_parser.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     TestSpecParser::TestSpecParser( ITagAliasRegistry const& tagAliases ) : m_tagAliases( &tagAliases ) {}
+ 
+@@ -14858,7 +14859,7 @@ namespace Catch {
+         return TestSpecParser( ITagAliasRegistry::get() ).parse( arg ).testSpec();
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_test_spec_parser.cpp
+ // start catch_timer.cpp
+ 
+@@ -14866,7 +14867,7 @@ namespace Catch {
+ 
+ static const uint64_t nanosecondsInSecond = 1000000000;
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     auto getCurrentNanosecondsSinceEpoch() -> uint64_t {
+         return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
+@@ -14924,7 +14925,7 @@ namespace Catch {
+         return getElapsedMicroseconds()/1000000.0;
+     }
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ // end catch_timer.cpp
+ // start catch_tostring.cpp
+ 
+@@ -14942,7 +14943,7 @@ namespace Catch {
+ #include <cmath>
+ #include <iomanip>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ namespace Detail {
+ 
+@@ -15171,7 +15172,7 @@ std::string ratio_string<std::nano>::symbol() { return "n"; }
+ std::string ratio_string<std::micro>::symbol() { return "u"; }
+ std::string ratio_string<std::milli>::symbol() { return "m"; }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #if defined(__clang__)
+ #    pragma clang diagnostic pop
+@@ -15180,7 +15181,7 @@ std::string ratio_string<std::milli>::symbol() { return "m"; }
+ // end catch_tostring.cpp
+ // start catch_totals.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     Counts Counts::operator - ( Counts const& other ) const {
+         Counts diff;
+@@ -15272,7 +15273,7 @@ namespace Catch {
+ // end catch_config_uncaught_exceptions.hpp
+ #include <exception>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     bool uncaught_exceptions() {
+ #if defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
+         return false;
+@@ -15282,13 +15283,13 @@ namespace Catch {
+         return std::uncaught_exception();
+ #endif
+   }
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_uncaught_exceptions.cpp
+ // start catch_version.cpp
+ 
+ #include <ostream>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     Version::Version
+         (   unsigned int _majorVersion,
+@@ -15324,7 +15325,7 @@ namespace Catch {
+ // end catch_version.cpp
+ // start catch_wildcard_pattern.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     WildcardPattern::WildcardPattern( std::string const& pattern,
+                                       CaseSensitive::Choice caseSensitivity )
+@@ -15366,7 +15367,7 @@ namespace Catch {
+ #include <iomanip>
+ #include <type_traits>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ namespace {
+ 
+@@ -15693,7 +15694,7 @@ namespace {
+ #include <cassert>
+ #include <memory>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     void prepareExpandedExpression(AssertionResult& result) {
+         result.getExpandedExpression();
+     }
+@@ -15757,7 +15758,7 @@ namespace Catch {
+         return false;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_reporter_bases.cpp
+ // start catch_reporter_compact.cpp
+ 
+@@ -15781,7 +15782,7 @@ namespace {
+ 
+ } // anon namespace
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ namespace {
+ // Colour, message variants:
+ // - white: No tests ran.
+@@ -16037,7 +16038,7 @@ private:
+ 
+     CATCH_REGISTER_REPORTER( "compact", CompactReporter )
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_reporter_compact.cpp
+ // start catch_reporter_console.cpp
+ 
+@@ -16056,7 +16057,7 @@ private:
+ #  pragma clang diagnostic ignored "-Wunused-function"
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+ namespace {
+ 
+@@ -16713,7 +16714,7 @@ void ConsoleReporter::printTestFilters() {
+ 
+ CATCH_REGISTER_REPORTER("console", ConsoleReporter)
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #if defined(_MSC_VER)
+ #pragma warning(pop)
+@@ -16730,7 +16731,7 @@ CATCH_REGISTER_REPORTER("console", ConsoleReporter)
+ #include <ctime>
+ #include <algorithm>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     namespace {
+         std::string getCurrentTimestamp() {
+@@ -16989,13 +16990,13 @@ namespace Catch {
+ 
+     CATCH_REGISTER_REPORTER( "junit", JunitReporter )
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_reporter_junit.cpp
+ // start catch_reporter_listening.cpp
+ 
+ #include <cassert>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     ListeningReporter::ListeningReporter() {
+         // We will assume that listeners will always want all assertions
+@@ -17144,7 +17145,7 @@ namespace Catch {
+         return true;
+     }
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ // end catch_reporter_listening.cpp
+ // start catch_reporter_xml.cpp
+ 
+@@ -17155,7 +17156,7 @@ namespace Catch {
+                               // and default is missing) is enabled
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     XmlReporter::XmlReporter( ReporterConfig const& _config )
+     :   StreamingReporterBase( _config ),
+         m_xml(_config.stream())
+@@ -17410,14 +17411,14 @@ namespace Catch {
+ 
+     CATCH_REGISTER_REPORTER( "xml", XmlReporter )
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #if defined(_MSC_VER)
+ #pragma warning(pop)
+ #endif
+ // end catch_reporter_xml.cpp
+ 
+-namespace Catch {
++namespace PrusaCatch {
+     LeakDetector leakDetector;
+ }
+ 
+diff --git a/tests/catch2/catch_reporter_automake.hpp b/tests/catch2/catch_reporter_automake.hpp
+index dbebe97..b4a12db 100644
+--- a/tests/catch2/catch_reporter_automake.hpp
++++ b/tests/catch2/catch_reporter_automake.hpp
+@@ -8,13 +8,15 @@
+ #ifndef TWOBLUECUBES_CATCH_REPORTER_AUTOMAKE_HPP_INCLUDED
+ #define TWOBLUECUBES_CATCH_REPORTER_AUTOMAKE_HPP_INCLUDED
+ 
++#include "prusa-catch-alias.hpp"
++
+ // Don't #include any Catch headers here - we can assume they are already
+ // included before this header.
+ // This is not good practice in general but is necessary in this case so this
+ // file can be distributed as a single header that works with the main
+ // Catch single header.
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct AutomakeReporter : StreamingReporterBase<AutomakeReporter> {
+         AutomakeReporter( ReporterConfig const& _config )
+@@ -57,6 +59,6 @@ namespace Catch {
+ 
+     CATCH_REGISTER_REPORTER( "automake", AutomakeReporter)
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #endif // TWOBLUECUBES_CATCH_REPORTER_AUTOMAKE_HPP_INCLUDED
+diff --git a/tests/catch2/catch_reporter_tap.hpp b/tests/catch2/catch_reporter_tap.hpp
+index 1bfe4f5..403002b 100644
+--- a/tests/catch2/catch_reporter_tap.hpp
++++ b/tests/catch2/catch_reporter_tap.hpp
+@@ -16,8 +16,9 @@
+ // Catch single header.
+ 
+ #include <algorithm>
++#include "prusa-catch-alias.hpp"
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct TAPReporter : StreamingReporterBase<TAPReporter> {
+ 
+@@ -248,6 +249,6 @@ namespace Catch {
+ 
+     CATCH_REGISTER_REPORTER( "tap", TAPReporter )
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #endif // TWOBLUECUBES_CATCH_REPORTER_TAP_HPP_INCLUDED
+diff --git a/tests/catch2/catch_reporter_teamcity.hpp b/tests/catch2/catch_reporter_teamcity.hpp
+index eca2885..b26e169 100644
+--- a/tests/catch2/catch_reporter_teamcity.hpp
++++ b/tests/catch2/catch_reporter_teamcity.hpp
+@@ -8,6 +8,8 @@
+ #ifndef TWOBLUECUBES_CATCH_REPORTER_TEAMCITY_HPP_INCLUDED
+ #define TWOBLUECUBES_CATCH_REPORTER_TEAMCITY_HPP_INCLUDED
+ 
++#include "prusa-catch-alias.hpp"
++
+ // Don't #include any Catch headers here - we can assume they are already
+ // included before this header.
+ // This is not good practice in general but is necessary in this case so this
+@@ -21,7 +23,7 @@
+ #   pragma clang diagnostic ignored "-Wpadded"
+ #endif
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ 
+     struct TeamCityReporter : StreamingReporterBase<TeamCityReporter> {
+         TeamCityReporter( ReporterConfig const& _config )
+@@ -211,7 +213,7 @@ namespace Catch {
+ 
+     CATCH_REGISTER_REPORTER( "teamcity", TeamCityReporter )
+ 
+-} // end namespace Catch
++} // end namespace PrusaCatch
+ 
+ #ifdef __clang__
+ #   pragma clang diagnostic pop
+diff --git a/tests/catch2/prusa-catch-alias.hpp b/tests/catch2/prusa-catch-alias.hpp
+new file mode 100644
+index 0000000..7ef7bde
+--- /dev/null
++++ b/tests/catch2/prusa-catch-alias.hpp
+@@ -0,0 +1,7 @@
++#ifndef PRUSA_CATCH
++#define PRUSA_CATCH 1
++
++namespace PrusaCatch {}
++namespace Catch = PrusaCatch;
++
++#endif  // PRUSA_CATCH
+diff --git a/tests/catch_main.hpp b/tests/catch_main.hpp
+index 5ab71fd..37ee2e6 100644
+--- a/tests/catch_main.hpp
++++ b/tests/catch_main.hpp
+@@ -6,7 +6,7 @@
+ #define CATCH_CONFIG_DEFAULT_REPORTER "verboseconsole"
+ #include <catch2/catch.hpp>
+ 
+-namespace Catch {
++namespace PrusaCatch {
+ struct VerboseConsoleReporter : public ConsoleReporter {
+     double duration = 0.;
+     using ConsoleReporter::ConsoleReporter;
+@@ -49,6 +49,6 @@ struct VerboseConsoleReporter : public ConsoleReporter {
+ 
+ CATCH_REGISTER_REPORTER( "verboseconsole", VerboseConsoleReporter )
+ 
+-} // namespace Catch
++} // namespace PrusaCatch
+ 
+ #endif // CATCH_MAIN

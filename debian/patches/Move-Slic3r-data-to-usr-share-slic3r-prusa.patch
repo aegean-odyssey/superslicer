@@ -1,0 +1,21 @@
+From: Nicolas Dandrimont <nicolas.dandrimont@crans.org>
+Date: Mon, 28 Oct 2013 10:42:53 +0100
+Subject: Move Slic3r data to /usr/share/slic3r-prusa
+
+---
+ lib/Slic3r.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Slic3r.pm b/lib/Slic3r.pm
+index 94f0b56..9b4f13c 100644
+--- a/lib/Slic3r.pm
++++ b/lib/Slic3r.pm
+@@ -29,7 +29,7 @@ BEGIN {
+ use FindBin;
+ 
+ # Let the XS module know where the GUI resources reside.
+-set_resources_dir(decode_path($FindBin::Bin) . (($^O eq 'darwin') ? '/../Resources' : '/resources'));
++set_resources_dir("/usr/share/slic3r-prusa3d");
+ set_var_dir(resources_dir() . "/icons");
+ set_local_dir(resources_dir() . "/localization/");
+ 

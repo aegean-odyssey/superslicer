@@ -1,0 +1,57 @@
+Source: superslicer
+Section: misc
+Priority: optional
+Maintainer: System Operator <wheel@unknown>
+#Uploaders: System Operator <wheel@unknown>
+Build-Depends: debhelper-compat (= 12),
+               cmake,
+               help2man,
+               libboost-all-dev,
+               libcereal-dev,
+               libcgal-dev,
+               libcurl4-gnutls-dev,
+               libdbus-1-dev,
+               libgtk-3-dev,
+               libtbb-dev,
+               libglew-dev,
+               libeigen3-dev,
+               libnlopt-cxx-dev | libnlopt-dev (<< 2.4.2+dfsg-5~),
+               libopenvdb-dev (>= 5.0),
+               libopenvdb-tools,
+               libpng-dev,
+               libgtest-dev (>= 1.7),
+               libudev-dev,
+               libwxgtk3.0-gtk3-dev,
+               xfonts-base,
+               xvfb,
+               xauth,
+               zlib1g-dev
+Standards-Version: 4.1.1
+Homepage: http://github.com/supermerill/SuperSlicer
+#Vcs-Browser: https://salsa.debian.org/debian/superslicer
+#Vcs-Git: https://salsa.debian.org/debian/superslicer.git
+
+Package: superslicer
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, fonts-noto-hinted
+Description: G-code generator for 3D printers
+ SuperSlicer converts digital 3D models into printing instructions (G-code)
+ for your 3D printer. It cuts the model into horizontal slices (layers),
+ generates toolpaths to fill them and calculates the amount of material
+ to be extruded.
+ .
+ SuperSlicer is a derivative of PrusaSlicer with a few extra features:
+ * more options for printing "thin walls";
+ * more options for printing "overhangs";
+ * more brim options (inside, outside only, "mouse ears", ...);
+ * settings to fine-tune the top surface quality;
+ * a denser infill option for supporting (solid) top layers;
+ * custom-made tests and built-in objects to calibrate printers;
+ * and more.
+ .
+ SuperSlicer supports input in the STL, AMF and OBJ formats, and can output
+ G-code for several series of 3D printers, including RepRap, Ultimaker,
+ Makerbot, as well as SVG files for DLP printers.
+ .
+ It can be used with a graphical interface, or in batch mode via the
+ command-line.

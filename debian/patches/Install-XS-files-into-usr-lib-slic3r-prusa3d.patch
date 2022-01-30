@@ -1,0 +1,23 @@
+From: Chow Loong Jin <hyperair@debian.org>
+Date: Mon, 21 Jan 2019 18:56:10 +0800
+Subject: Install XS files into /usr/lib/slic3r-prusa3d
+
+---
+ xs/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xs/CMakeLists.txt b/xs/CMakeLists.txt
+index 962e2e0..53c00bf 100644
+--- a/xs/CMakeLists.txt
++++ b/xs/CMakeLists.txt
+@@ -197,8 +197,8 @@ if (MSVC)
+ endif()
+ 
+ # Installation
+-install(TARGETS XS DESTINATION ${PERL_VENDORARCH}/auto/Slic3r/XS)
+-install(FILES lib/Slic3r/XS.pm DESTINATION ${PERL_VENDORLIB}/Slic3r)
++install(TARGETS XS DESTINATION lib/slic3r-prusa3d/auto/Slic3r/XS)
++install(FILES lib/Slic3r/XS.pm DESTINATION lib/slic3r-prusa3d/Slic3r)
+ 
+ # Unit / integration tests
+ enable_testing()

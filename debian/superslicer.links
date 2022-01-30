@@ -1,0 +1,4 @@
+/usr/share/SuperSlicer/icons/SuperSlicer_128px.png /usr/share/icons/hicolor/128x128/apps/superslicer.png
+/usr/share/SuperSlicer/icons/SuperSlicer_192px.png /usr/share/icons/hicolor/192x192/apps/superslicer.png
+#/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf /usr/share/SuperSlicer/fonts/NotoSans-Regular.ttf
+/usr/bin/superslicer /usr/bin/superslicer-gcodeviewer

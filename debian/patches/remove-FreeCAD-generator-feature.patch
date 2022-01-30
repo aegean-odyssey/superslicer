@@ -1,0 +1,148 @@
+--- a/src/slic3r/GUI/Preferences.cpp
++++ b/src/slic3r/GUI/Preferences.cpp
+@@ -58,7 +58,7 @@
+ std::shared_ptr<ConfigOptionsGroup> PreferencesDialog::create_gui_options_group(const wxString& title, wxNotebook* tabs)
+ {
+ 
+-	std::shared_ptr<ConfigOptionsGroup> optgroup = std::make_shared<ConfigOptionsGroup>((wxPanel*)tabs->GetPage(3), title);
++	std::shared_ptr<ConfigOptionsGroup> optgroup = std::make_shared<ConfigOptionsGroup>((wxPanel*)tabs->GetPage(2), title);
+ 	optgroup->title_width = 40;
+ 	optgroup->label_width = 40;
+ 	optgroup->m_on_change = [this, tabs](t_config_option_key opt_key, boost::any value) {
+@@ -375,24 +375,6 @@
+ 
+     activate_options_tab(m_optgroups_general.back(), m_optgroups_general.back()->parent()->GetSizer()->GetItemCount() > 1 ? 3 : 20);
+ 
+-	
+-	// Add "Paths" tab
+-	m_optgroup_paths = create_options_tab(_L("Paths"), tabs);
+-	m_optgroup_paths->title_width = 10;
+-	m_optgroup_paths->m_on_change = [this](t_config_option_key opt_key, boost::any value) {
+-		m_values[opt_key] = boost::any_cast<std::string>(value);
+-	};
+-	def.label = L("FreeCAD path");
+-	def.type = coString;
+-	def.tooltip = L("If it point to a valid freecad instance (the bin directory or the python executable), you can use the built-in python script to quickly generate geometry.");
+-	def.set_default_value(new ConfigOptionString{ app_config->get("freecad_path") });
+-	option = Option(def, "freecad_path");
+-	//option.opt.full_width = true;
+-	option.opt.width = 50;
+-	m_optgroup_paths->append_single_option_line(option);
+-
+-	activate_options_tab(m_optgroup_paths);
+-
+ 	// Add "Camera" tab
+ 	m_optgroup_camera = create_options_tab(_L("Camera"), tabs);
+ 	m_optgroup_camera->m_on_change = [this](t_config_option_key opt_key, boost::any value) {
+@@ -680,7 +662,6 @@
+ 			i--;
+ 		}
+ 	}
+-	m_optgroup_paths->msw_rescale();
+ 	m_optgroup_camera->msw_rescale();
+ 	for (int i = 0; i < (int)m_optgroups_gui.size(); i++) {
+ 		if (m_optgroups_gui[i]) {
+@@ -810,7 +791,7 @@
+ 
+ 	auto sizer = new wxBoxSizer(wxHORIZONTAL);
+ 	sizer->Add(m_layout_mode_box, 1, wxALIGN_CENTER_VERTICAL);
+-	wxBoxSizer* parent_sizer = static_cast<wxBoxSizer*>(static_cast<wxPanel*>(tabs->GetPage(3))->GetSizer());
++	wxBoxSizer* parent_sizer = static_cast<wxBoxSizer*>(static_cast<wxPanel*>(tabs->GetPage(2))->GetSizer());
+ 	parent_sizer->Add(sizer, 0, wxEXPAND);
+ }
+ 
+--- a/src/slic3r/GUI/Preferences.hpp
++++ b/src/slic3r/GUI/Preferences.hpp
+@@ -20,7 +20,6 @@
+ 	std::map<std::string, std::string>	m_values;
+ 	std::vector<std::string>			m_values_need_restart;
+ 	std::vector<std::shared_ptr<ConfigOptionsGroup>> m_optgroups_general;
+-	std::shared_ptr<ConfigOptionsGroup>	m_optgroup_paths;
+ 	std::shared_ptr<ConfigOptionsGroup>	m_optgroup_camera;
+ 	std::vector<std::shared_ptr<ConfigOptionsGroup>> m_optgroups_gui;
+ #if ENABLE_ENVIRONMENT_MAP
+--- a/src/slic3r/CMakeLists.txt
++++ b/src/slic3r/CMakeLists.txt
+@@ -43,8 +43,6 @@
+     GUI/3DScene.cpp
+     GUI/3DScene.hpp
+     GUI/format.hpp
+-    GUI/FreeCADDialog.cpp
+-    GUI/FreeCADDialog.hpp
+     GUI/GLShadersManager.hpp
+     GUI/GLShadersManager.cpp
+     GUI/GLShader.cpp
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -42,9 +42,9 @@
+     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+         set (wxWidgets_CONFIG_OPTIONS "--toolkit=gtk${SLIC3R_GTK}")
+         if (SLIC3R_WX_STABLE)
+-            find_package(wxWidgets 3.0 REQUIRED COMPONENTS base core adv html gl stc)
++            find_package(wxWidgets 3.0 REQUIRED COMPONENTS base core adv html gl)
+         else ()
+-            find_package(wxWidgets 3.1 QUIET COMPONENTS base core adv html gl stc)
++            find_package(wxWidgets 3.1 QUIET COMPONENTS base core adv html gl)
+ 
+             if (NOT wxWidgets_FOUND)
+                 message(FATAL_ERROR "\nCould not find wxWidgets 3.1.\n"
+--- a/src/slic3r/GUI/GUI_App.cpp
++++ b/src/slic3r/GUI/GUI_App.cpp
+@@ -64,7 +64,6 @@
+ #include "CalibrationTempDialog.hpp"
+ #include "CalibrationRetractionDialog.hpp"
+ #include "ConfigSnapshotDialog.hpp"
+-#include "FreeCADDialog.hpp"
+ #include "FirmwareDialog.hpp"
+ #include "Preferences.hpp"
+ #include "Tab.hpp"
+@@ -1350,10 +1349,6 @@
+ {
+     change_calibration_dialog(nullptr, new CalibrationRetractionDialog(this, mainframe));
+ }
+-void GUI_App::freecad_script_dialog()
+-{
+-    change_calibration_dialog(nullptr, new FreeCADDialog(this, mainframe));
+-}
+ 
+ // static method accepting a wxWindow object as first parameter
+ bool GUI_App::catch_error(std::function<void()> cb,
+--- a/src/slic3r/GUI/GUI_App.hpp
++++ b/src/slic3r/GUI/GUI_App.hpp
+@@ -204,7 +204,6 @@
+     void            over_bridge_dialog();
+     void            calibration_cube_dialog();
+ 	void            calibration_retraction_dialog();
+-    void            freecad_script_dialog();
+     //void            support_tuning(); //have to do multiple, in a submenu
+     void            load_project(wxWindow *parent, wxString& input_file) const;
+     void            import_model(wxWindow *parent, wxArrayString& input_files) const;
+--- a/src/slic3r/GUI/MainFrame.cpp
++++ b/src/slic3r/GUI/MainFrame.cpp
+@@ -1511,18 +1511,6 @@
+             [this](wxCommandEvent&) { wxGetApp().calibration_cube_dialog(); });
+     }
+ 
+-    // objects menu
+-    wxMenu* generationMenu = nullptr;
+-    if (wxGetApp().is_editor())
+-    {
+-        generationMenu  = new wxMenu();
+-        append_menu_item(generationMenu, wxID_ANY, _(L("FreeCad python script")), _(L("Create an object by writing little easy script.")),
+-            [this](wxCommandEvent&) { wxGetApp().freecad_script_dialog(); });
+-        append_menu_item(generationMenu, wxID_ANY, _(L("Script help page")), _(L("How to use the FreeCad python script window.")),
+-            [this](wxCommandEvent&) { wxLaunchDefaultBrowser("https://github.com/supermerill/SuperSlicer/wiki/FreePySCAD-script-window"); });
+-
+-    }
+-
+     // Help menu
+     auto helpMenu = generate_help_menu();
+ 
+@@ -1535,7 +1523,6 @@
+     m_menubar->Append(windowMenu, _L("&Window"));
+     if (viewMenu) m_menubar->Append(viewMenu, _L("&View"));
+     if (calibrationMenu) m_menubar->Append(calibrationMenu, _L("C&alibration"));
+-    if (generationMenu) m_menubar->Append(generationMenu, _L("&Generate"));
+     // Add additional menus from C++
+     wxGetApp().add_config_menu(m_menubar);
+     m_menubar->Append(helpMenu, _L("&Help"));

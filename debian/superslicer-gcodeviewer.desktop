@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SuperSlicer (GCodeViewer)
+Comment=View G-Code with SuperSlicer
+Icon=superslicer
+Exec=superslicer --gcodeviewer %F
+Terminal=false
+StartupNotify=false
+StartupWMClass=SuperSlicer
+MimeType=text/x.gcode;
+Categories=Engineering;Graphics;3DGraphics;

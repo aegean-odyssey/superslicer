@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/sla">
+    <comment>Stereolithography File Format</comment>
+    <glob pattern="*.stl"/>
+  </mime-type>
+  <mime-type type="model/x-wavefront-obj">
+    <comment>Wavefront Object File</comment>
+    <glob pattern="*.obj"/>
+  </mime-type>
+  <mime-type type="model/x-geomview-off">
+    <comment>Geomview Object File Format</comment>
+    <glob pattern="*.off"/>
+    <magic priority="50">
+      <match value="OFF" type="string" offset="0"/>
+    </magic>
+  </mime-type>
+  <mime-type type="application/x-amf">
+    <comment>Additive Manufacturing File Format</comment>
+    <glob pattern="*.amf"/>
+  </mime-type>
+</mime-info>

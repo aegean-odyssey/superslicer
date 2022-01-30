@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SuperSlicer
+Comment=G-code generator for 3D printers
+Icon=superslicer
+Exec=superslicer %F
+Keywords=perl;slice;3D;printer;convert;gcode;stl;obj;amf;
+StartupNotify=false
+StartupWMClass=SuperSlicer
+MimeType=application/sla;model/x-wavefront-obj;model/x-geomview-off;application/x-amf;
+Categories=Development;Engineering;
