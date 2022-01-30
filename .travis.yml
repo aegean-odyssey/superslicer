@@ -1,0 +1,36 @@
+if: tag =~ /^AO-/
+
+language: shell
+
+os: linux
+
+dist: focal
+
+arch:
+  - arm64
+# - amd64
+
+services:
+  - docker
+
+before_install:
+  - cat .travis_dockerfile | docker build -t ao:travis -
+  - git switch -c master
+
+script:
+  - DEPS="mk-build-deps -i -t 'apt-get --no-install-recommends --yes'"
+  - CLEAN="rm -f superslicer-build-deps_*"
+  - BUILD="gbp buildpackage -uc -us -J1 -j1 --git-submodules" 
+  - docker run -v $(pwd):/root ao:travis su -l -c "$DEPS && $CLEAN && $BUILD"
+
+deploy:
+  provider: releases
+  edge: true
+  token: $HIDDEN_TOKEN
+  on:
+    tags: true
+  overwrite: true
+  file_glob: true
+  file: ../*.{deb,xz,gz,dsc,build,buildinfo,changes}
+  prerelease: true
+  target_commitish: master

@@ -9,6 +9,9 @@ on:
 jobs:
 
   arm64_job:
+    ### FIXME! The build time exceeds the GitHub's runner time limit.
+    ### The emulated arm64 is slow! >6hrs to build, so don't even try. 
+    if: false
 
     name: Debian Bullseye (arm64)
     runs-on: ubuntu-18.04
