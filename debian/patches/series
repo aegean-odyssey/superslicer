@@ -1,7 +1,6 @@
 Move-Slic3r-data-to-usr-share-slic3r-prusa.patch
 Install-XS-files-into-usr-lib-slic3r-prusa3d.patch
 Move-Catch-namespace-into-PrusaCatch.patch
-fix-FTBS-with-SLIC3R_WX_STABLE.patch
 fix-to-paint-splashscreen.patch
 remove-FreeCAD-generator-feature.patch
 change-bgcolor-ConfigWizard-filament-note.patch

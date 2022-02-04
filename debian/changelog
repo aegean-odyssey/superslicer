@@ -1,3 +1,11 @@
+superslicer (2.3.57.10-1) unstable; urgency=medium
+
+  * upstream version 2.3.57.10
+
+  * drop fix-FTBS-with-SLIC3R_WX_STABLE.patch, fixed upstream
+
+ -- Aegean Odyssey <57586704+aegean-odyssey@users.noreply.github.com>  Fri, 04 Feb 2022 08:08:38 +0000
+
 superslicer (2.3.57.9-2) unstable; urgency=medium
 
   * remove-FreeCAD-generator-feature.patch
