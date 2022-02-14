@@ -1,9 +1,7 @@
 ### travis-ci build fails. It seems to not provide sufficient
 ### resources (i.e., ram, cpu) to successfully compile, so we
 ### disable it here
-if: false
-
-if: tag =~ /^AO-/
+if: tag =~ /^NEVER_AO-/
 
 language: shell
 
