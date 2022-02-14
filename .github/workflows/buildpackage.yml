@@ -9,9 +9,9 @@ on:
 jobs:
 
   arm64_job:
-    ### FIXME! The build time exceeds the GitHub's runner time limit.
-    ### The emulated arm64 is slow! >6hrs to build, so don't even try. 
-    if: false
+    ### FYI! The arm64 build time may exceed the GitHub's runner
+    ### six hour time limit. It can be disabled here, if necessary.
+    #if: false
 
     name: Debian Bullseye (arm64)
     runs-on: ubuntu-18.04
@@ -41,7 +41,7 @@ jobs:
             mk-build-deps -i -t 'apt-get --no-install-recommends --yes'
             rm -f superslicer-build-deps_*
             GBPOPTS="--git-export-dir=artifacts --git-upstream-tree=SLOPPY"
-            gbp buildpackage -uc -us -J2 -j2 --git-submodules $GBPOPTS
+            gbp buildpackage -uc -us -J4 -j4 --git-submodules $GBPOPTS
     
       - name: DEPLOY
         uses: softprops/action-gh-release@v1
@@ -55,6 +55,7 @@ jobs:
             artifacts/*.changes
 
   amd64_job:
+    #if: false
 
     name: Debian Bullseye (amd64)
     runs-on: ubuntu-18.04
