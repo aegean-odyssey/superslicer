@@ -1,3 +1,4 @@
+quick-fix-for-problematic-profiles.patch
 Move-Slic3r-data-to-usr-share-slic3r-prusa.patch
 Install-XS-files-into-usr-lib-slic3r-prusa3d.patch
 Move-Catch-namespace-into-PrusaCatch.patch

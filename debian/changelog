@@ -1,3 +1,12 @@
+superslicer (2.3.57.12-2) unstable; urgency=medium
+
+  * quick-fix-for-problematic-profiles.patch
+    The stable version (this) SuperSlicer does not handle some new profile
+    settings despite release notes to the contrary. We patch the troublesome
+    profiles to keep the program from generating a segmentation fault.
+ 
+ -- Aegean Odyssey <57586704+aegean-odyssey@users.noreply.github.com>  Tue, 04 May 2022 21:03:27 +0000
+
 superslicer (2.3.57.12-1) unstable; urgency=medium
 
   * upstream version 2.3.57.12
