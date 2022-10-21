@@ -14,8 +14,6 @@ XCode is available through Apple's App Store, the other three tools are availabl
 ### How to get the source code
 
 You have to gitclone  the repository
-
-Open 'terminal' and enter each line, one at a time.
 ```
 git clone https://github.com/supermerill/SuperSlicer.git
 ```
@@ -23,7 +21,6 @@ git clone https://github.com/supermerill/SuperSlicer.git
 and then you have to clone the profiles submodules
 
 ```
-cd SuperSlicer
 cd resources/profiles
 git submodule update
 ```
@@ -35,11 +32,7 @@ The executable & dmg should be somewhere in the build directory.
 
 ### How to build
 
-You can follow the [script](https://github.com/supermerill/Slic3r/blob/master/.github/workflows/ccpp_mac.yml) the build server use to create the ubuntu release.
-
-You have to execute each command at the right of the 'run: ' tags, in the directory that is at the right of the previous 'working-directory:' tag.
-
-You can stop after the `make slic3r` as the rest of the commands are for building the .dmg
+Just use the `BuildMacOS.sh` script (use the `-h` option to get the options available, and how to use them)
 
 # Old doc, not up-to-date:
 
@@ -123,10 +116,11 @@ Works on a fresh installation of MacOS Catalina 10.15.6
     
 - Enter:
 
-```brew install cmake git gettext
+```
 brew update
+brew install cmake git gettext
 brew upgrade
-git clone https://github.com/prusa3d/PrusaSlicer/
+git clone https://github.com/supermerill/SuperSlicer/
 cd PrusaSlicer/deps
 mkdir build
 cd build
@@ -137,4 +131,5 @@ mkdir build
 cd build
 cmake .. -DCMAKE_PREFIX_PATH="$PWD/../deps/build/destdir/usr/local"
 make
-src/prusa-slicer
+src/superslicer
+```
