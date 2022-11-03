@@ -1,5 +1,5 @@
-# start with debian bullseye
-FROM debian:bullseye
+# start with debian bookworm
+FROM debian:bookworm
 
 # install a minimal-ish set of things for debian packaging
 RUN apt-get update -q -q && apt-get upgrade --yes

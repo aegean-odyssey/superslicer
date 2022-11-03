@@ -13,7 +13,7 @@ jobs:
     ### six hour time limit. It can be disabled here, if necessary.
     #if: false
 
-    name: Debian Bullseye (arm64)
+    name: Debian Bookworm (arm64)
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2.1.0
@@ -23,7 +23,9 @@ jobs:
           git switch -c master
 
       - name: COMPILE
-        uses: uraimo/run-on-arch-action@v2.1.1
+        #uses: uraimo/run-on-arch-action@v2.1.1
+        # use a fork of the run-on-arch action that supports bookworm
+        uses: roscale/run-on-arch-action@debian-bookworm-aarch64
         with:
           arch: aarch64
           distro: bullseye
@@ -57,7 +59,7 @@ jobs:
   amd64_job:
     #if: false
 
-    name: Debian Bullseye (amd64)
+    name: Debian Bookworm (amd64)
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2.1.0
@@ -67,7 +69,7 @@ jobs:
           git switch -c master
 
       - name: COMPILE
-        uses: ./.github/debian_bullseye/
+        uses: ./.github/debian_bookworm/
         with:
           args: >
             /bin/sh -c "
