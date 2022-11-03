@@ -1,0 +1,13 @@
+Index: superslicer/src/slic3r/GUI/OpenGLManager.cpp
+===================================================================
+--- superslicer.orig/src/slic3r/GUI/OpenGLManager.cpp	2022-10-24 16:27:06.843286015 +0000
++++ superslicer/src/slic3r/GUI/OpenGLManager.cpp	2022-10-24 16:27:06.827285977 +0000
+@@ -237,7 +237,7 @@
+ bool OpenGLManager::init_gl()
+ {
+     if (!m_gl_initialized) {
+-        if (glewInit() != GLEW_OK) {
++        if ((glewInit() & 3) != GLEW_OK) {
+             BOOST_LOG_TRIVIAL(error) << "Unable to init glew library";
+             return false;
+         }

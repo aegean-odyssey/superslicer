@@ -1,10 +1,35 @@
+superslicer (2.3.57.12-3) unstable; urgency=medium
+
+  * Patch to ignore error returned by glewInit(). This thorny issue
+    is discussed in Bug#1020640 and Bug#1020702. This patch *SEEMS*
+    to work, but the issue will need a proper resolution. YMMV
+  * Patch to fix wxGTK ampersand issue UnsavedChangesDialog. (& -> &amp;)
+    patch to change '&' to '&amp;' for html markdown in the Unsaved Changes
+    dialog. Items with an ampersand (e.g. 'Width & Flow') would be missing
+    from the dialog box, causing problems.
+  * Patch FindOpenVDB.cmake with updated file from prusa-slicer 2.5
+
+  patches (refreshed) from prusa-slicer packaging:
+
+  * Stop linking against cereal library as it doesn't exist. Fixes FTBFS.
+  * Use packaged catch2 library. Thanks to Tobias Frost <tobi@debian.org>
+  * Build-dep on catch2 and drop tests/catch2 files
+  * Drop Move-Catch-namespace-into-PrusaCatch.patch.
+    This is no longer needed now that we're using the packaged catch library
+  * Disable compilation of test_voronoi.cpp to workaround FTBFS
+  * Patch to fix wxTranslations::Get() nullptr segfault
+  * Set OPENVDB_FIND_MODULE_PATH to use upstream FindOpenVDB.cmake
+  * Change to build with wxWidgets 3.2, OpenVDB 9, libglew 2.2
+
+ -- Aegean Odyssey <57586704+aegean-odyssey@users.noreply.github.com>  Wed, 19 Oct 2022 21:03:27 +0000
+
 superslicer (2.3.57.12-2) unstable; urgency=medium
 
   * quick-fix-for-problematic-profiles.patch
     The stable version (this) SuperSlicer does not handle some new profile
     settings despite release notes to the contrary. We patch the troublesome
     profiles to keep the program from generating a segmentation fault.
- 
+
  -- Aegean Odyssey <57586704+aegean-odyssey@users.noreply.github.com>  Tue, 04 May 2022 21:03:27 +0000
 
 superslicer (2.3.57.12-1) unstable; urgency=medium

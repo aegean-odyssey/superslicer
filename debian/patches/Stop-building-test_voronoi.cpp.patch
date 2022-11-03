@@ -1,0 +1,24 @@
+From: Chow Loong Jin <hyperair@debian.org>
+Date: Sun, 21 Nov 2021 00:31:58 +0800
+Subject: Stop building test_voronoi.cpp
+
+test_voronoi.cpp compmilation hangs forever, see https://bugs.debian.org/998049.
+Disable test_voronoi.cpp to fix the FTBFS until that is fixed.
+
+Bug-Debian: https://bugs.debian.org/984338
+---
+ tests/libslic3r/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/libslic3r/CMakeLists.txt b/tests/libslic3r/CMakeLists.txt
+index 352580f..bc568da 100644
+--- a/tests/libslic3r/CMakeLists.txt
++++ b/tests/libslic3r/CMakeLists.txt
+@@ -18,7 +18,6 @@ add_executable(${_TEST_NAME}_tests
+ 	test_meshboolean.cpp
+ 	test_marchingsquares.cpp
+ 	test_timeutils.cpp
+-	test_voronoi.cpp
+     test_optimizers.cpp
+     test_png_io.cpp
+     test_timeutils.cpp

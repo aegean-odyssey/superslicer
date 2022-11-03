@@ -1,7 +1,13 @@
-quick-fix-for-problematic-profiles.patch
 Move-Slic3r-data-to-usr-share-slic3r-prusa.patch
 Install-XS-files-into-usr-lib-slic3r-prusa3d.patch
-Move-Catch-namespace-into-PrusaCatch.patch
+Stop-building-test_voronoi.cpp.patch
+Use-packaged-catch2-library.patch
 fix-to-paint-splashscreen.patch
 remove-FreeCAD-generator-feature.patch
 change-bgcolor-ConfigWizard-filament-note.patch
+quick-fix-for-problematic-profiles.patch
+Drop-lcereal.patch
+Fix-segfault-from-null-WxTranslations_Get.patch
+update-FindOpenVDB_cmake.patch
+fix-ampersand-issue-in-UnsavedChangesDialog.patch
+ignore-error-returned-by-glewInit.patch

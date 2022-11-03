@@ -1,0 +1,60 @@
+Index: superslicer/src/slic3r/GUI/UnsavedChangesDialog.cpp
+===================================================================
+--- superslicer.orig/src/slic3r/GUI/UnsavedChangesDialog.cpp	2022-10-20 18:31:08.260285826 +0000
++++ superslicer/src/slic3r/GUI/UnsavedChangesDialog.cpp	2022-10-20 18:29:03.615495001 +0000
+@@ -231,6 +231,10 @@
+ 
+ wxDataViewItem UnsavedChangesModel::AddPreset(Preset::Type type, wxString preset_name, PrinterTechnology pt)
+ {
++#if defined(SUPPORTS_MARKUP) && !defined(__APPLE__)
++    preset_name.Replace("&", "&amp;");
++    preset_name.Replace("&amp;amp;", "&amp;");
++#endif
+     // "color" strings
+     color_string(preset_name, def_text_color());
+     make_string_bold(preset_name);
+@@ -247,6 +251,10 @@
+ 
+ ModelNode* UnsavedChangesModel::AddOption(ModelNode* group_node, wxString option_name, wxString old_value, wxString new_value)
+ {
++#if defined(SUPPORTS_MARKUP) && !defined(__APPLE__)
++    option_name.Replace("&", "&amp;");
++    option_name.Replace("&amp;amp;", "&amp;");
++#endif
+     group_node->Append(std::make_unique<ModelNode>(group_node, option_name, old_value, new_value));
+     ModelNode* option = group_node->GetChildren().back().get();
+     wxDataViewItem group_item = wxDataViewItem((void*)group_node);
+@@ -258,6 +266,10 @@
+ 
+ ModelNode* UnsavedChangesModel::AddOptionWithGroup(ModelNode* category_node, wxString group_name, wxString option_name, wxString old_value, wxString new_value)
+ {
++#if defined(SUPPORTS_MARKUP) && !defined(__APPLE__)
++    group_name.Replace("&", "&amp;");
++    group_name.Replace("&amp;amp;", "&amp;");
++#endif
+     category_node->Append(std::make_unique<ModelNode>(category_node, group_name));
+     ModelNode* group_node = category_node->GetChildren().back().get();
+     ItemAdded(wxDataViewItem((void*)category_node), wxDataViewItem((void*)group_node));
+@@ -278,6 +290,14 @@
+ wxDataViewItem UnsavedChangesModel::AddOption(Preset::Type type, wxString category_name, wxString group_name, wxString option_name,
+                                               wxString old_value, wxString new_value, const std::string category_icon_name)
+ {
++#if defined(SUPPORTS_MARKUP) && !defined(__APPLE__)
++    category_name.Replace("&", "&amp;");
++    category_name.Replace("&amp;amp;", "&amp;");
++    group_name.Replace("&", "&amp;");
++    group_name.Replace("&amp;amp;", "&amp;");
++    option_name.Replace("&", "&amp;");
++    option_name.Replace("&amp;amp;", "&amp;");
++#endif
+     // "color" strings
+     color_string(category_name, def_text_color());
+     color_string(group_name,    def_text_color());
+@@ -580,6 +600,7 @@
+     wxColour bgr_clr = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+     SetBackgroundColour(bgr_clr);
+ 
++    this->SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+ #if ENABLE_WX_3_1_3_DPI_CHANGED_EVENT && defined(__WXMSW__)
+     // ys_FIXME! temporary workaround for correct font scaling
+     // Because of from wxWidgets 3.1.3 auto rescaling is implemented for the Fonts,

@@ -1,0 +1,12 @@
+Index: superslicer/src/slic3r/GUI/GUI_App.cpp
+===================================================================
+--- superslicer.orig/src/slic3r/GUI/GUI_App.cpp	2022-10-20 06:09:50.515079541 +0000
++++ superslicer/src/slic3r/GUI/GUI_App.cpp	2022-10-20 06:19:55.097154631 +0000
+@@ -1614,6 +1614,7 @@
+         {
+ 	    	// Allocating a temporary locale will switch the default wxTranslations to its internal wxTranslations instance.
+ 	    	wxLocale temp_locale;
++		temp_locale.Init();
+ 	    	// Set the current translation's language to default, otherwise GetBestTranslation() may not work (see the wxWidgets source code).
+ 	    	wxTranslations::Get()->SetLanguage(wxLANGUAGE_DEFAULT);
+ 	    	// Let the wxFileTranslationsLoader enumerate all translation dictionaries for PrusaSlicer

@@ -20,6 +20,7 @@ override_dh_auto_configure:
 	dh_auto_configure --buildsystem=cmake -- \
 		-DBUILD_TESTING=0 \
 		-DCMAKE_BUILD_TYPE=Release \
+		-DOPENVDB_FIND_MODULE_PATH=/usr/lib/$(DEB_HOST_MULTIARCH)/cmake/OpenVDB \
 		-DSLIC3R_FHS=1 \
 		-DSLIC3R_WX_STABLE=1 \
 		-DSLIC3R_GTK=3
