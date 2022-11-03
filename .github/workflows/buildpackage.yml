@@ -28,7 +28,7 @@ jobs:
         uses: roscale/run-on-arch-action@debian-bookworm-aarch64
         with:
           arch: aarch64
-          distro: bullseye
+          distro: bookworm
 
           githubToken: ${{ github.token }}
 
